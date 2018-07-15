@@ -12,7 +12,7 @@ class Genetic { // eslint-disable-line no-unused-vars
     return this;
   }
 
-  pushNodesRandomGenes(params) {
+  pushNodeRandomGene(params) {
     let genome = [];
     let i = 0;
     let j = 0;
@@ -26,7 +26,18 @@ class Genetic { // eslint-disable-line no-unused-vars
     return this;
   }
 
-  fitness(genomeExpected) {
+  static compareGenome(genomeA, genomeB) {
+    const genesMatch = [];
+    let geneIndex = 0;     
+    genomeA.forEach((gene) => {
+      if (genomeB[geneIndex] === gene) { genesMatch[geneIndex] = true; }
+      else { genesMatch[geneIndex] = false; }
+      geneIndex += 1;
+    });
+    return genesMatch;
+  }
+
+  static getPercentMatchFromCompareGenome(genesMatch) {
 
   }
 }

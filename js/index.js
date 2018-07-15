@@ -1,3 +1,4 @@
+/* global Genetic */
 const fs = require('fs');
 const vm = require('vm');
 
@@ -8,7 +9,7 @@ function include(path) {
 
 include('../js/genetic.class.js');
 const genetic = new Genetic();
-genetic.pushNodesRandomGenes({
+genetic.pushNodeRandomGene({
   nodeMax: 10, geneMax: 10, min: 0, max: 9,
 });
 

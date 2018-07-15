@@ -11,10 +11,12 @@ function include(path) {
 include('../js/genetic.class.js');
 const genetic = new Genetic();
 
+
 tap.ok(new Genetic(), 'new Genetic');
-tap.ok(genetic.pushNode(), 'genetic.pushNode');
-tap.ok(genetic.pushNodesRandomGenes({
+// tap.ok(genetic.pushNode(), 'genetic.pushNode');
+tap.ok(genetic.pushNodeRandomGene({
   nodeMax: 10, geneMax: 10, min: 0, max: 9,
 }), 'genetic.pushNodeRandom');
 
 console.log(genetic.nodes);
+console.log(Genetic.compareGenome(genetic.nodes[0].genome, genetic.nodes[1].genome));
