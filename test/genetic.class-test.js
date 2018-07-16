@@ -20,3 +20,4 @@ tap.ok(genetic.pushNodeRandomGene({
 
 console.log(genetic.nodes);
 console.log(Genetic.compareGenome(genetic.nodes[0].genome, genetic.nodes[1].genome));
+console.log(Genetic.compareGenome(genetic.nodes[0].genome, genetic.nodex[1].genome).getMatchEvaluationRaw());

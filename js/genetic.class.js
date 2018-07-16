@@ -3,9 +3,9 @@ class Genetic { // eslint-disable-line no-unused-vars
     this.nodes = [];
   }
 
-  pushNode(genome = [0, 0, 0, 0]) {
+  pushNode(genomeSequence = [0, 0, 0, 0]) {
     const node = {};
-    node.genome = genome.slice();
+    node.genome = genomeSequence.slice();
     node.selected = false;
     node.score = 0;
     this.nodes.push(node);
@@ -37,7 +37,19 @@ class Genetic { // eslint-disable-line no-unused-vars
     return genesMatch;
   }
 
-  static getPercentMatchFromCompareGenome(genesMatch) {
-
+  static getMatchEvaluationRaw(genesMatch) {
+    const total = 0;
+    const trueMax = 0;
+    const count = 0;
+    const rt = { true: 0, false: 0, total: 0 };
+    genesMatch.forEach((geneMatch) => {
+      // nbr true * 100 / total (%)
+      if (geneMatch === true) { trueMax += 1; }
+      count += 1;
+    });
+    rt.true = trueMax;
+    rt.total = count;
+    rt.false = count - trueMax;
+    return rt;
   }
 }
