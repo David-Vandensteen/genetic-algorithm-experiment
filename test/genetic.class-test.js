@@ -8,16 +8,11 @@ function include(path) {
   vm.runInThisContext(code, path);
 }
 
+include('../js/genome.class.js');
 include('../js/genetic.class.js');
 const genetic = new Genetic();
 
 
 tap.ok(new Genetic(), 'new Genetic');
-// tap.ok(genetic.pushNode(), 'genetic.pushNode');
-tap.ok(genetic.pushNodeRandomGene({
-  nodeMax: 10, geneMax: 10, min: 0, max: 9,
-}), 'genetic.pushNodeRandom');
-
+tap.ok(new Genetic(new Genome().randomize({ gene: 10, min: 0, max: 0 })));
 console.log(genetic.nodes);
-console.log(Genetic.compareGenome(genetic.nodes[0].genome, genetic.nodes[1].genome));
-console.log(Genetic.compareGenome(genetic.nodes[0].genome, genetic.nodex[1].genome).getMatchEvaluationRaw());
