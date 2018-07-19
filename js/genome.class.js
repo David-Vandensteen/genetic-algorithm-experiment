@@ -5,12 +5,23 @@ class Genome { // eslint-disable-line no-unused-vars
 
   static make(params) {
     const nodes = [];
+    let i = 0;
     if (params.sequences !== 'random') {
       params.sequences.forEach((seq) => {
         nodes.push(new Genome(seq));
+        i += 1;
       });
+      if (params.genomes) { // padding with rand genomes
+        let j = params.genomes - i;
+        const genesMax = Genome.genesCount(params.sequences[0]);
+        while (j > 0) {
+          nodes.push(new Genome().randomize({
+            genes: genesMax, min: params.min, max: params.max,
+          }));
+          j -= 1;
+        }
+      }
     } else {
-      let i;
       for (i = 0; i < params.genomes; i += 1) {
         nodes.push(new Genome().randomize({
           genes: params.genes, min: params.min, max: params.max,
@@ -20,17 +31,21 @@ class Genome { // eslint-disable-line no-unused-vars
     return nodes;
   }
 
-  /*
-  static compare(genomes) {
+  static genesCount(sequence) {
+    let i = 0;
+    sequence.forEach(() => {
+      i += 1;
+    });
+    return i;
+  }
+
+  static extractSequences(genomes) {
     const rt = [];
-    let genomeIndex = 0;
     genomes.forEach((genome) => {
-      rt.push(Object.assign(genome.compare(genomes[genomeIndex + 1]), { index: [genomeIndex, genomeIndex + 1] }));
-      if (genomeIndex < genomes.length - 2) genomeIndex += 1;
+      rt.push(genome.sequence);
     });
     return rt;
   }
-  */
 
   randomize(params) {
     this.sequence = [];
@@ -77,7 +92,7 @@ class Genome { // eslint-disable-line no-unused-vars
   }
 
   mutate(minValue, maxValue) {
-    const index = Math.floor((Math.random() * this.sequence.length - 1) + 0);
+    const index = Math.floor((Math.random() * this.sequence.length) + 0);
     const value = Math.floor((Math.random() * maxValue) + minValue);
     this.sequence[index] = value;
     return this;
