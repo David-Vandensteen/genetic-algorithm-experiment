@@ -4,6 +4,11 @@ function table.copy(tableSrc)
   return rt
 end
 
+function table.trunc(tableSrc, size)
+  for i = size + 1 , table.getn(tableSrc) do tableSrc[i] = nil end
+  return tableSrc
+end
+
 function genesMake(geneMax)
   local genes = {}
   for i = 1, geneMax do genes[i] = math.random(0,4) end
@@ -14,13 +19,6 @@ function genomesMake(genomeMax, geneMax)
   local genomes = {}
   for i = 1, genomeMax do genomes[i] = genesMake(geneMax) end
   return genomes
-end
-
-function genomeTrunc(genome, indexMax)
-  for i = indexMax + 1, table.getn(genome) do
-    genome[i] = nil
-  end
-  return genome
 end
 
 function genomeCrossOver(genome1, genome2)

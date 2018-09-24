@@ -5,6 +5,35 @@ function genomesPrint(genomes)
   for i = 1, table.getn(genomes) do table.print(genomes[i]) end
 end
 
+function genomesSortByBests(genomes, bests)
+  local rt = {}
+  for i = 1, table.getn(genomes) do rt[i] = genomes[bests[i]] end
+  genomes = table.copy(rt)
+  return rt
+end
+
+function genomesSortByScores(genomes, scores)
+  local bests = {}
+  for i = 1, table.getn(scores) do
+    bests[i] = i
+  end
+  for i = 1, table.getn(scores) do
+    for j = 1, table.getn(scores) do
+      if scores[i] > scores[j] then
+        tmp = scores[i]
+        scores[i] = scores[j]
+        scores[j] = tmp
+        
+        tmpBest = bests[i]
+        bests[i] = bests[j]
+        bests[j] = tmpBest
+      end
+    end
+  end
+  return genomesSortByBests(genomes, bests)
+end
+
+
 print("table test")
 print("create table (1, 2, 3)")
 local tableSrc = {}
@@ -22,6 +51,10 @@ table.print(tableSrc)
 print("")
 print("table dest (altered) - result -> (1, 2, 3, 4)")
 table.print(tableDest)
+print("table.trunc(tableSrc, 2) - result -> (1, 2)")
+table.print(table.trunc(tableSrc, 2))
+print('table.trunc({ 10, 11, 12, 20, 25}, 4) - result -> (10, 11, 12, 20)')
+table.print(table.trunc({ 10, 11, 12, 20, 25}, 4))
 print("")
 
 
@@ -33,10 +66,6 @@ print("")
 print("genomesMake(3, 10) test - result -> 3 arrays of 10")
 local genomes = genomesMake(3, 10)
 genomesPrint(genomes)
-print("")
-
-print("genomeTrunc(genomes[3], 3) test - result -> (x, x, x)")
-table.print(genomeTrunc(genomes[3], 3))
 print("")
 
 print("genomeCrossOver(genomes[1], genomes[2]) test")
@@ -58,3 +87,17 @@ print("genomePad(genomes[1], 20) test - result (x * 20)")
 table.print(genomePad(genomes[1], 20))
 print("")
 
+print("genomeScores test")
+print("genomesMake(10, 3)")
+local genomes = genomesMake(10, 3)
+genomesPrint(genomes)
+local bests = { 4, 3 ,2 ,1 ,6 ,5 ,9 ,8, 7, 10 }
+print("best genome table")
+table.print(bests)
+print("genomesSortByBests(genomes, bests)")
+genomesPrint(genomesSortByBests(genomes, bests))
+print("genomesSortByScores(genomes, scores)")
+local scores = { 300, 250, 120, 600, 900, 270, 535, 699, 50, 122 }
+table.print(scores)
+genomesPrint(genomesSortByScores(genomes, scores))
+print("")
