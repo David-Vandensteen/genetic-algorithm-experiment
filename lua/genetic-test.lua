@@ -5,35 +5,6 @@ function genomesPrint(genomes)
   for i = 1, table.getn(genomes) do table.print(genomes[i]) end
 end
 
-function genomesSortByBests(genomes, bests)
-  local rt = {}
-  for i = 1, table.getn(genomes) do rt[i] = genomes[bests[i]] end
-  genomes = table.copy(rt)
-  return rt
-end
-
-function genomesSortByScores(genomes, scores)
-  local bests = {}
-  for i = 1, table.getn(scores) do
-    bests[i] = i
-  end
-  for i = 1, table.getn(scores) do
-    for j = 1, table.getn(scores) do
-      if scores[i] > scores[j] then
-        tmp = scores[i]
-        scores[i] = scores[j]
-        scores[j] = tmp
-        
-        tmpBest = bests[i]
-        bests[i] = bests[j]
-        bests[j] = tmpBest
-      end
-    end
-  end
-  return genomesSortByBests(genomes, bests)
-end
-
-
 print("table test")
 print("create table (1, 2, 3)")
 local tableSrc = {}
@@ -100,4 +71,12 @@ print("genomesSortByScores(genomes, scores)")
 local scores = { 300, 250, 120, 600, 900, 270, 535, 699, 50, 122 }
 table.print(scores)
 genomesPrint(genomesSortByScores(genomes, scores))
+print("")
+
+print("genomesTrunc(genomes, 3) test")
+genomesPrint(genomesTrunc(genomes, 3))
+print("")
+
+print("genomesPad(genomes, 10, 10) test")
+genomesPrint(genomesPad(genomes,10, 10))
 print("")

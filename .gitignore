@@ -2,3 +2,4 @@ node_modules/
 package-lock.json
 .vscode
 .nyc_output
+lua/super_mario_bross.log

@@ -2,11 +2,21 @@
 --SPEED = "normal"
 --SPEED = "turbo"
 SPEED = "maximum"
+LOG = "super_mario_bross.log"
 frameCount = 0
 
 require "genetic"
 
 function wait(frameMax) for i = 0, frameMax do frameEnd() end end
+
+function logWrite(value)
+  emu.print(value)
+  file = io.open(LOG, "a")
+  io.output(file)
+  io.write(value["message"])
+  io.write("\n")
+  io.close(file)
+end
 
 function joypadUpdate(value)
   if value == 0 then joypad.write(1, {A = false, right = false, left = false, down = false}) end  
@@ -46,49 +56,21 @@ function marioIsDead()
   return rt
 end
 
-function marioGetMaxDist(currentMax, genomesScores)
+function marioGetMaxDist(currentMax, scores)
   local rt = currentMax
-  for i = 1, table.getn(genomesScores) do
-    if genomesScores[i] > rt then rt = genomesScores[i] end
+  for i = 1, table.getn(scores) do
+    if scores[i] > rt then rt = scores[i] end
   end
   return rt
 end
 
-function marioFitness(genomes, genomesScores, geneMax)
-  local rt = {}
-  local bestsScores = {}
-  local bestsIds = {}
-  for i = 0, table.getn(genomesScores) do
-    bestsScores[i] = genomesScores[i]
+function marioFitness(genomes, scores, genomeMax, geneMax)
+  genomesSortByScores(genomes, scores)
+  for i = 2, (table.getn(genomes) - 2) do
+    genomes[i] = table.copy(genomes[1])
+    table.trunc(genomes[i], table.getn(genomes[i]) - 10)
   end
-  table.sort(bestsScores, function(a, b) return a > b end)
-  for i = 1, table.getn(genomesScores) do
-    if genomesScores[i] == bestsScores[1] then bestsIds[1] = i end
-    if genomesScores[i] == bestsScores[2] then bestsIds[2] = i end
-    if genomesScores[i] == bestsScores[3] then bestsIds[3] = i end
-    if genomesScores[i] == bestsScores[4] then bestsIds[4] = i end
-    if genomesScores[i] == bestsScores[5] then bestsIds[5] = i end
-    if genomesScores[i] == bestsScores[6] then bestsIds[6] = i end
-    if genomesScores[i] == bestsScores[7] then bestsIds[7] = i end
-    if genomesScores[i] == bestsScores[8] then bestsIds[8] = i end
-  end
-  rt[1] = genomeCrossOver(genomes[bestsIds[1]], genomes[bestsIds[2]])
-  rt[2] = genomeCrossOver(genomes[bestsIds[3]], genomes[bestsIds[4]])
-  rt[3] = genomeCrossOver(genomes[bestsIds[5]], genomes[bestsIds[6]])
-  rt[4] = genomeCrossOver(genomes[bestsIds[7]], genomes[bestsIds[8]])
-  genomeMutate(rt[1])
-  genomeMutate(rt[2])
-  genomeMutate(rt[3])
-  genomeMutate(rt[4])
-  genomePad(rt[1], geneMax)
-  genomePad(rt[2], geneMax)
-  genomePad(rt[3], geneMax)
-  genomePad(rt[4], geneMax)
-  return rt
-end
-
-function genomeTrunc(genome, indexMax)
-  for i = indexMax, table.getn(genome) do genome[i] = nil end
+  genomesPad(genomes, genomeMax, geneMax)
 end
 
 function hud(generation, genome, maxDist)
@@ -98,7 +80,6 @@ function hud(generation, genome, maxDist)
   gui.text(50, 10, genome)
   gui.text(150, 0, "max dist")
   gui.text(200, 0, maxDist)
-
 end
 
 function frameEnd()
@@ -110,13 +91,13 @@ function main()
   init()
   local GENOME_MAX = 10
   local GENE_MAX = 1000
-  local JOYPAD_RATE = 30
+  local JOYPAD_RATE = 40
   local generationIndex = 1
   local genomeIndex = 1
   local geneIndex = 1
   local maxDist = 0
   genomes = genomesMake(GENOME_MAX, GENE_MAX)
-  local genomesScores = { 0 }
+  local scores = { 0 }
   marioStart()
   while true do
     marioGetPosition()
@@ -125,21 +106,14 @@ function main()
     end
     joypadUpdate(genomes[genomeIndex][geneIndex])
     if marioIsDead() then
-      genomesScores[genomeIndex] = marioGetPosition()
-      maxDist = marioGetMaxDist(maxDist, genomesScores)
-      genomeTrunc(genomes[genomeIndex], geneIndex)
+      scores[genomeIndex] = marioGetPosition()
+      maxDist = marioGetMaxDist(maxDist, scores)
+      table.trunc(genomes[genomeIndex], geneIndex + 1)
       genomeIndex = genomeIndex + 1
       geneIndex = 1
       if genomeIndex > GENOME_MAX then
-        local genomesBest = marioFitness(genomes, genomesScores, GENE_MAX)
-        genomes = genomesMake(GENOME_MAX, GENE_MAX)
-
-        genomes[1] = genomesBest[1]
-        genomes[2] = genomesBest[2]
-        genomes[3] = genomesBest[3]
-        genomes[5] = genomesBest[4]
-
-        emu.print(genomesScores)
+        marioFitness(genomes, scores, GENOME_MAX, GENE_MAX)
+        emu.print(scores)
         geneIndex = 1
         genomeIndex = 1
         generationIndex = generationIndex + 1
@@ -151,4 +125,5 @@ function main()
     frameEnd()
   end
 end
-main()
+--main()
+logWrite{"message" = "TEST"})
