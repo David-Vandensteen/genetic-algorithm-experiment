@@ -1,22 +1,22 @@
--- Supported are "normal","turbo","nothrottle","maximum". But know that except for "normal", all other modes will run as "turbo" for now.
+--[[
+
+    David Vandensteen
+    2018
+
+    Mario Bross agent for Fceux LUA
+    Genetic algorithm is used for agent learning
+
+--]]
+
+--Supported are "normal","turbo","nothrottle","maximum"
 --SPEED = "normal"
 --SPEED = "turbo"
 SPEED = "maximum"
-LOG = "super_mario_bross.log"
 frameCount = 0
 
 require "genetic"
 
 function wait(frameMax) for i = 0, frameMax do frameEnd() end end
-
-function logWrite(value)
-  emu.print(value)
-  file = io.open(LOG, "a")
-  io.output(file)
-  io.write(value["message"])
-  io.write("\n")
-  io.close(file)
-end
 
 function joypadUpdate(value)
   if value == 0 then joypad.write(1, {A = false, right = false, left = false, down = false}) end  
@@ -125,5 +125,4 @@ function main()
     frameEnd()
   end
 end
---main()
-logWrite{"message" = "TEST"})
+main()

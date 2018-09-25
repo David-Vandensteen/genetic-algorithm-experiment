@@ -1,3 +1,12 @@
+--[[
+
+    David Vandensteen
+    2018
+
+    Genetic lib for LUA
+
+--]]
+
 function table.copy(tableSrc)
   local rt = {}
   for i = 1, table.getn(tableSrc) do rt[i] = tableSrc[i] end
@@ -21,17 +30,17 @@ function genomesMake(genomeMax, geneMax)
   return genomes
 end
 
-function genomeCrossOver(genome1, genome2)
+function genomeCrossOver(genomes)
   local rt = {}
-  if table.getn(genome1) > table.getn(genome1) then maxRandom = table.getn(genome1)
-    else maxRandom = table.getn(genome2)
+  if table.getn(genomes[1]) > table.getn(genomes[1]) then maxRandom = table.getn(genomes[1])
+    else maxRandom = table.getn(genomes[2])
   end
   local cutIndex = math.random(0, maxRandom)
   for i = 0, cutIndex do
-    rt[i] = genome1[i]
+    rt[i] = genomes[1][i]
   end
-  for i = cutIndex, table.getn(genome2) do
-    rt[i] = genome2[i]
+  for i = cutIndex, table.getn(genomes[2]) do
+    rt[i] = genomes[2][i]
   end
   return rt
 end
@@ -92,3 +101,4 @@ function genomesPad(genomes, genomeMax, geneMax)
   end
   return genomes
 end
+

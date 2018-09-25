@@ -1,8 +1,36 @@
 require "genetic"
+
+local logFile = "super_mario_bross.log"
+
 function table.print(tableSrc) print(table.concat( tableSrc, ", ")) end
 
 function genomesPrint(genomes)
   for i = 1, table.getn(genomes) do table.print(genomes[i]) end
+end
+
+function loggerSetFile(file)
+  logFile = file
+end
+
+function loggerClear()
+  local file = io.open(logFile, "w+")
+  io.close(file)
+end
+
+function logger(value)
+  local file = io.open(logFile, "a")
+  io.output(file)
+  io.write(value)
+  io.write("\n")
+  io.close(file)
+end
+
+function loggerGenome(genome)
+  logger(table.concat(genome))
+end
+
+function loggerGenomes(genomes)
+  for i = 1, table.getn(genomes) do loggerGenome(genomes[i]) end
 end
 
 print("table test")
@@ -28,7 +56,6 @@ print('table.trunc({ 10, 11, 12, 20, 25}, 4) - result -> (10, 11, 12, 20)')
 table.print(table.trunc({ 10, 11, 12, 20, 25}, 4))
 print("")
 
-
 print("genesMake(10) test")
 local genes = genesMake(10)
 table.print(genes)
@@ -39,11 +66,19 @@ local genomes = genomesMake(3, 10)
 genomesPrint(genomes)
 print("")
 
-print("genomeCrossOver(genomes[1], genomes[2]) test")
-local genomeCross = genomeCrossOver(genomes[1], genomes[2])
+print("genomeCrossOver{genomes[1], genomes[2]} test")
+local genomeCross = genomeCrossOver{genomes[1], genomes[2]}
 table.print(genomes[1])
 table.print(genomes[2])
 table.print(genomeCross)
+print("")
+
+print("genomeCrossOver with asymmetric table test")
+local genomeA = genesMake(10)
+local genomeB = genesMake(20)
+table.print(genomeA)
+table.print(genomeB)
+table.print(genomeCrossOver{genomeA, genomeB})
 print("")
 
 print("x 4 - genomeMutate(genome) test")
@@ -79,4 +114,14 @@ print("")
 
 print("genomesPad(genomes, 10, 10) test")
 genomesPrint(genomesPad(genomes,10, 10))
+print("")
+
+print("logger test")
+loggerSetFile("super_mario_bross.log")
+loggerClear()
+logger(os.date())
+logger("Hello genome")
+loggerGenome(genomes[1])
+logger("Hello genomes")
+loggerGenomes(genomes)
 print("")
