@@ -1,36 +1,27 @@
+--[[
+
+    David Vandensteen
+    2018
+
+    Genetic test
+
+--]]
+require "lua-extend"
+require "logger"
 require "genetic"
 
-local logFile = "super_mario_bross.log"
-
-function table.print(tableSrc) print(table.concat( tableSrc, ", ")) end
-
-function genomesPrint(genomes)
-  for i = 1, table.getn(genomes) do table.print(genomes[i]) end
+--extend logger
+function logger.genome(genome)
+  logger.info(table.concat(genome))
 end
 
-function loggerSetFile(file)
-  logFile = file
+function logger.genomes(genomes)
+  for i = 1, table.getn(genomes) do logger.genome(genomes[i]) end
 end
+--
 
-function loggerClear()
-  local file = io.open(logFile, "w+")
-  io.close(file)
-end
-
-function logger(value)
-  local file = io.open(logFile, "a")
-  io.output(file)
-  io.write(value)
-  io.write("\n")
-  io.close(file)
-end
-
-function loggerGenome(genome)
-  logger(table.concat(genome))
-end
-
-function loggerGenomes(genomes)
-  for i = 1, table.getn(genomes) do loggerGenome(genomes[i]) end
+function printGenomes(genomes)
+  for i = 1, table.getn(genomes) do printTable(genomes[i]) end
 end
 
 print("table test")
@@ -39,89 +30,90 @@ local tableSrc = {}
 tableSrc[1] = 1
 tableSrc[2] = 2
 tableSrc[3] = 3
-table.print(tableSrc)
+printTable(tableSrc)
 print("")
 
 print("table.copy(tableSrc) test")
 local tableDest = table.copy(tableSrc)
 tableDest[3 + 1] = 4
 print("table source - result -> (1, 2, 3)")
-table.print(tableSrc)
+printTable(tableSrc)
 print("")
 print("table dest (altered) - result -> (1, 2, 3, 4)")
-table.print(tableDest)
+printTable(tableDest)
 print("table.trunc(tableSrc, 2) - result -> (1, 2)")
-table.print(table.trunc(tableSrc, 2))
+printTable(table.trunc(tableSrc, 2))
 print('table.trunc({ 10, 11, 12, 20, 25}, 4) - result -> (10, 11, 12, 20)')
-table.print(table.trunc({ 10, 11, 12, 20, 25}, 4))
+printTable(table.trunc({ 10, 11, 12, 20, 25}, 4))
 print("")
 
-print("genesMake(10) test")
-local genes = genesMake(10)
-table.print(genes)
+print("genome.make(10) test")
+local genes = genome.make(10)
+printTable(genes)
 print("")
 
-print("genomesMake(3, 10) test - result -> 3 arrays of 10")
-local genomes = genomesMake(3, 10)
-genomesPrint(genomes)
+print("genomes.make(3, 10) test - result -> 3 arrays of 10")
+local genomesM = genomes.make(3, 10)
+printGenomes(genomes)
 print("")
 
-print("genomeCrossOver{genomes[1], genomes[2]} test")
-local genomeCross = genomeCrossOver{genomes[1], genomes[2]}
-table.print(genomes[1])
-table.print(genomes[2])
-table.print(genomeCross)
+print("genome.crossOver{genomesM[1], genomesM[2]} test")
+local genomeCross = genome.crossOver{genomesM[1], genomesM[2]}
+printTable(genomesM[1])
+printTable(genomesM[2])
+printTable(genomeCross)
 print("")
 
 print("genomeCrossOver with asymmetric table test")
-local genomeA = genesMake(10)
-local genomeB = genesMake(20)
-table.print(genomeA)
-table.print(genomeB)
-table.print(genomeCrossOver{genomeA, genomeB})
+local genomeA = genome.make(10)
+local genomeB = genome.make(20)
+printTable(genomeA)
+printTable(genomeB)
+printTable(genome.crossOver{genomeA, genomeB})
 print("")
 
 print("x 4 - genomeMutate(genome) test")
-table.print(genomeCross)
-table.print(genomeMutate(genomeCross))
-table.print(genomeMutate(genomeCross))
-table.print(genomeMutate(genomeCross))
-table.print(genomeMutate(genomeCross))
+printTable(genomeCross)
+printTable(genome.mutate(genomeCross))
+printTable(genome.mutate(genomeCross))
+printTable(genome.mutate(genomeCross))
+printTable(genome.mutate(genomeCross))
 print("")
 
-print("genomePad(genomes[1], 20) test - result (x * 20)")
-table.print(genomePad(genomes[1], 20))
+print("genome.pad(genomes[1], 20) test - result (x * 20)")
+printTable(genome.pad(genomesM[1], 20))
 print("")
 
 print("genomeScores test")
-print("genomesMake(10, 3)")
-local genomes = genomesMake(10, 3)
-genomesPrint(genomes)
+print("genomes.make(10, 3)")
+local genomesM = genomes.make(10, 3)
+
+printGenomes(genomesM)
 local bests = { 4, 3 ,2 ,1 ,6 ,5 ,9 ,8, 7, 10 }
 print("best genome table")
-table.print(bests)
-print("genomesSortByBests(genomes, bests)")
-genomesPrint(genomesSortByBests(genomes, bests))
-print("genomesSortByScores(genomes, scores)")
+printTable(bests)
+print("genomes.sortByBests(genomesM, bests)")
+printGenomes(genomes.sortByBests(genomesM, bests))
+print("genomes.sortByScores(genomesM, scores)")
 local scores = { 300, 250, 120, 600, 900, 270, 535, 699, 50, 122 }
-table.print(scores)
-genomesPrint(genomesSortByScores(genomes, scores))
+printTable(scores)
+printGenomes(genomes.sortByScores(genomesM, scores))
 print("")
 
 print("genomesTrunc(genomes, 3) test")
-genomesPrint(genomesTrunc(genomes, 3))
+printGenomes(genomes.trunc(genomesM, 3))
 print("")
 
-print("genomesPad(genomes, 10, 10) test")
-genomesPrint(genomesPad(genomes,10, 10))
+print("genomes.pad(genomes, 10, 10) test")
+printGenomes(genomes.pad(genomesM,10, 10))
 print("")
 
 print("logger test")
-loggerSetFile("super_mario_bross.log")
-loggerClear()
-logger(os.date())
-logger("Hello genome")
-loggerGenome(genomes[1])
-logger("Hello genomes")
-loggerGenomes(genomes)
+logger.setFile("super_mario_bross.log")
+logger.clear()
+logger.info(os.date())
+logger.info("Hello genome")
+logger.genome(genomesM[1])
+logger.info("Hello genomes")
+logger.genomes(genomesM)
 print("")

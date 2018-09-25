@@ -8,13 +8,14 @@
 
 --]]
 
+require "lua-extend"
+require "genetic"
+
 --Supported are "normal","turbo","nothrottle","maximum"
 --SPEED = "normal"
 --SPEED = "turbo"
 SPEED = "maximum"
 frameCount = 0
-
-require "genetic"
 
 function wait(frameMax) for i = 0, frameMax do frameEnd() end end
 
@@ -32,7 +33,8 @@ function init()
 end
 
 -- Mario Bros Functions
-function marioStart()
+local mario = {}
+function mario.start()
   wait(50)
   joypad.write(1, {start = true})
   frameEnd()
@@ -40,12 +42,12 @@ function marioStart()
   frameEnd()
 end
 
-function marioGetPosition()
+function mario.getPosition()
   local marioX = memory.readbyte(0x6D) * 0x100 + memory.readbyte(0x86)
   return marioX or 0
 end
 
-function marioIsDead()
+function mario.isDead()
   local deathMusicLoaded = 0x0712
   local playerState = 0x000E
   local rt = false
@@ -56,7 +58,7 @@ function marioIsDead()
   return rt
 end
 
-function marioGetMaxDist(currentMax, scores)
+function mario.getMaxDist(currentMax, scores)
   local rt = currentMax
   for i = 1, table.getn(scores) do
     if scores[i] > rt then rt = scores[i] end
@@ -64,13 +66,12 @@ function marioGetMaxDist(currentMax, scores)
   return rt
 end
 
-function marioFitness(genomes, scores, genomeMax, geneMax)
-  genomesSortByScores(genomes, scores)
-  for i = 2, (table.getn(genomes) - 2) do
-    genomes[i] = table.copy(genomes[1])
-    table.trunc(genomes[i], table.getn(genomes[i]) - 10)
+function mario.fitness(pgenomes, scores, genomeMax, geneMax)
+  genomes.sortByScores(pgenomes, scores)
+  for i = 1, (table.getn(pgenomes) - 2) do
+    table.trunc(pgenomes[i], table.getn(pgenomes[i]) - 3)
   end
-  genomesPad(genomes, genomeMax, geneMax)
+  genomes.pad(pgenomes, genomeMax, geneMax)
 end
 
 function hud(generation, genome, maxDist)
@@ -96,30 +97,28 @@ function main()
   local genomeIndex = 1
   local geneIndex = 1
   local maxDist = 0
-  genomes = genomesMake(GENOME_MAX, GENE_MAX)
+  _genomes = genomes.make(GENOME_MAX, GENE_MAX)
   local scores = { 0 }
-  marioStart()
+  mario.start()
   while true do
-    marioGetPosition()
-    if (frameCount % JOYPAD_RATE) == 0 then 
-      geneIndex = geneIndex + 1
-    end
-    joypadUpdate(genomes[genomeIndex][geneIndex])
-    if marioIsDead() then
-      scores[genomeIndex] = marioGetPosition()
-      maxDist = marioGetMaxDist(maxDist, scores)
-      table.trunc(genomes[genomeIndex], geneIndex + 1)
+    mario.getPosition()
+    if (frameCount % JOYPAD_RATE) == 0 then geneIndex = geneIndex + 1      
+    else joypadUpdate(_genomes[genomeIndex][geneIndex]) end
+    if mario.isDead() then
+      scores[genomeIndex] = mario.getPosition()
+      maxDist = mario.getMaxDist(maxDist, scores)
+      table.trunc(_genomes[genomeIndex], geneIndex)
       genomeIndex = genomeIndex + 1
       geneIndex = 1
       if genomeIndex > GENOME_MAX then
-        marioFitness(genomes, scores, GENOME_MAX, GENE_MAX)
+        mario.fitness(_genomes, scores, GENOME_MAX, GENE_MAX)
         emu.print(scores)
         geneIndex = 1
         genomeIndex = 1
         generationIndex = generationIndex + 1
       end  
       emu.softreset()
-      marioStart()
+      mario.start()
     end
     hud(generationIndex, genomeIndex, maxDist)
     frameEnd()

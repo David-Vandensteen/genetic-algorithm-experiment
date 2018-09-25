@@ -6,31 +6,22 @@
     Genetic lib for LUA
 
 --]]
+genome = {}
+genomes = {}
 
-function table.copy(tableSrc)
-  local rt = {}
-  for i = 1, table.getn(tableSrc) do rt[i] = tableSrc[i] end
-  return rt
-end
-
-function table.trunc(tableSrc, size)
-  for i = size + 1 , table.getn(tableSrc) do tableSrc[i] = nil end
-  return tableSrc
-end
-
-function genesMake(geneMax)
+function genome.make(geneMax)
   local genes = {}
   for i = 1, geneMax do genes[i] = math.random(0,4) end
   return genes
 end
 
-function genomesMake(genomeMax, geneMax)
-  local genomes = {}
-  for i = 1, genomeMax do genomes[i] = genesMake(geneMax) end
-  return genomes
+function genomes.make(genomeMax, geneMax)
+  local rt = {}
+  for i = 1, genomeMax do rt[i] = genome.make(geneMax) end
+  return rt
 end
 
-function genomeCrossOver(genomes)
+function genome.crossOver(genomes)
   local rt = {}
   if table.getn(genomes[1]) > table.getn(genomes[1]) then maxRandom = table.getn(genomes[1])
     else maxRandom = table.getn(genomes[2])
@@ -45,32 +36,32 @@ function genomeCrossOver(genomes)
   return rt
 end
 
-function genomePad(genome, geneMax)
+function genome.pad(genome, geneMax)
   for i = 1, geneMax do
     if genome[i] == nil then genome[i] = math.random(0, 4) end
   end
   return genome
 end
 
-function genomeMutate(genome)
+function genome.mutate(genome)
   local mutateIndex = math.random(1, table.getn(genome))
   genome[mutateIndex] = math.random(0, 4)
   return genome
 end
 
-function genomesTrunc(genomes, size)
+function genomes.trunc(genomes, size)
   for i = size + 1, table.getn(genomes) do genomes[i] = nil end
   return genomes
 end
 
-function genomesSortByBests(genomes, bests)
+function genomes.sortByBests(genomes, bests)
   local rt = {}
   for i = 1, table.getn(genomes) do rt[i] = genomes[bests[i]] end
   genomes = table.copy(rt)
   return rt
 end
 
-function genomesSortByScores(genomes, scores)
+function genomes.sortByScores(pgenomes, scores)
   local bests = {}
   for i = 1, table.getn(scores) do
     bests[i] = i
@@ -88,15 +79,15 @@ function genomesSortByScores(genomes, scores)
       end
     end
   end
-  return genomesSortByBests(genomes, bests)
+  return genomes.sortByBests(pgenomes, bests)
 end
 
-function genomesPad(genomes, genomeMax, geneMax)
+function genomes.pad(genomes, genomeMax, geneMax)
   for i = 1, genomeMax do
     if genomes[i] == nil then 
-      genomes[i] = genesMake(geneMax)
+      genomes[i] = genome.make(geneMax)
     else
-      genomePad(genomes[i], geneMax)
+      genome.pad(genomes[i], geneMax)
     end
   end
   return genomes
