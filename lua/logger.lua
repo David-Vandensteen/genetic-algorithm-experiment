@@ -8,7 +8,7 @@
 --]]
 
 logger = {}
-logger.file = "super_mario_bross.log"
+logger.file = "super_mario_bros.log"
 
 function logger.setFile(file)
   logger.file = file
