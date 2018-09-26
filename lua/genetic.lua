@@ -15,10 +15,22 @@ function genome.make(geneMax)
   return genes
 end
 
+function genome.add(genome)
+  genome = genome or {}
+  table.insert(genome, math.random(0, 4))
+  return genome
+end
+
 function genomes.make(genomeMax, geneMax)
   local rt = {}
   for i = 1, genomeMax do rt[i] = genome.make(geneMax) end
   return rt
+end
+
+function genomes.add(genomes)
+  genomes = genomes or {}
+  table.insert(genomes, genome.add())
+  return genomes
 end
 
 function genome.crossOver(genomes)

@@ -14,22 +14,22 @@ require "genetic"
 --Supported are "normal","turbo","nothrottle","maximum"
 --SPEED = "normal"
 --SPEED = "turbo"
-SPEED = "maximum"
+--SPEED = "maximum"
 frameCount = 0
 
 function wait(frameMax) for i = 0, frameMax do frameEnd() end end
 
 function joypadUpdate(value)
-  if value == 0 then joypad.write(1, {A = false, right = false, left = false, down = false}) end  
-  if value == 1 then joypad.write(1, {right = true}) end  
-  if value == 2 then joypad.write(1, {left = true}) end  
-  if value == 3 then joypad.write(1, {down = true}) end  
-  if value == 4 then joypad.write(1, {A = true}) end  
+  if value == 0 then joypad.write(1, {A = false, right = true, left = false, down = false}) end
+  if value == 1 then joypad.write(1, {A = true, right = false, left = false, down = false}) end
+  if value == 2 then joypad.write(1, {A = false, right = false, left = false, down = true}) end
+  if value == 3 then joypad.write(1, {A = true, right = true, left = false, down = false}) end
+  if value == 4 then joypad.write(1, {A = true, right = true, left = false, down = true}) end
 end
 
 function init()
   emu.softreset()
-  emu.speedmode(SPEED)
+  if SPEED then emu.speedmode(SPEED) end
 end
 
 -- Mario Bros Functions
@@ -41,6 +41,17 @@ function mario.start()
   joypad.write(1, {start = true})
   frameEnd()
 end
+
+function mario.getWorld()
+  local world = memory.readbyte(0x75f)
+  return world or 0
+end
+
+function mario.getLevel()
+  local level = memory.readbyte(0x75c)
+  return level or 0
+end
+
 
 function mario.getPosition()
   local marioX = memory.readbyte(0x6D) * 0x100 + memory.readbyte(0x86)
@@ -74,13 +85,15 @@ function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   genomes.pad(pgenomes, genomeMax, geneMax)
 end
 
-function hud(generation, genome, maxDist)
+function hud(generation, genome, maxDist, curDist)
   gui.text(0, 0, "generation")
   gui.text(50, 0, generation)
   gui.text(0, 10, "genome")
   gui.text(50, 10, genome)
-  gui.text(150, 0, "max dist")
+  gui.text(150, 0, "max. dist")
   gui.text(200, 0, maxDist)
+  gui.text(150, 10, "cur. dist")
+  gui.text(200, 10, curDist)
 end
 
 function frameEnd()
@@ -120,7 +133,7 @@ function main()
       emu.softreset()
       mario.start()
     end
-    hud(generationIndex, genomeIndex, maxDist)
+    hud(generationIndex, genomeIndex, maxDist, mario.getPosition())
     frameEnd()
   end
 end
