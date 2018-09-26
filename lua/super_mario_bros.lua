@@ -3,7 +3,7 @@
     David Vandensteen
     2018
 
-    Mario Bross agent for Fceux LUA
+    Mario Bros agent for Fceux LUA
     Genetic algorithm is used for agent learning
 
 --]]
