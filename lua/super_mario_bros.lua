@@ -14,7 +14,7 @@ require "genetic"
 --Supported are "normal","turbo","nothrottle","maximum"
 --SPEED = "normal"
 --SPEED = "turbo"
---SPEED = "maximum"
+SPEED = "maximum"
 frameCount = 0
 
 function wait(frameMax) for i = 0, frameMax do frameEnd() end end
@@ -82,7 +82,6 @@ function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   for i = 1, (table.getn(pgenomes) - 2) do
     table.trunc(pgenomes[i], table.getn(pgenomes[i]) - 3)
   end
-  genomes.pad(pgenomes, genomeMax, geneMax)
 end
 
 function hud(generation, genome, maxDist, curDist)
@@ -110,18 +109,20 @@ function main()
   local genomeIndex = 1
   local geneIndex = 1
   local maxDist = 0
-  _genomes = genomes.make(GENOME_MAX, GENE_MAX)
+  _genomes = genomes.add()
   local scores = { 0 }
   mario.start()
   while true do
     mario.getPosition()
-    if (frameCount % JOYPAD_RATE) == 0 then geneIndex = geneIndex + 1      
+    if (frameCount % JOYPAD_RATE) == 0 then 
+      geneIndex = geneIndex + 1      
+      if _genomes[genomeIndex][geneIndex] == nil then genome.add(_genomes[genomeIndex]) end
     else joypadUpdate(_genomes[genomeIndex][geneIndex]) end
     if mario.isDead() then
       scores[genomeIndex] = mario.getPosition()
       maxDist = mario.getMaxDist(maxDist, scores)
-      table.trunc(_genomes[genomeIndex], geneIndex)
       genomeIndex = genomeIndex + 1
+      if _genomes[genomeIndex] == nil then genomes.add(_genomes) end
       geneIndex = 1
       if genomeIndex > GENOME_MAX then
         mario.fitness(_genomes, scores, GENOME_MAX, GENE_MAX)

@@ -9,22 +9,10 @@
 genome = {}
 genomes = {}
 
-function genome.make(geneMax)
-  local genes = {}
-  for i = 1, geneMax do genes[i] = math.random(0,4) end
-  return genes
-end
-
 function genome.add(genome)
   genome = genome or {}
   table.insert(genome, math.random(0, 4))
   return genome
-end
-
-function genomes.make(genomeMax, geneMax)
-  local rt = {}
-  for i = 1, genomeMax do rt[i] = genome.make(geneMax) end
-  return rt
 end
 
 function genomes.add(genomes)
@@ -48,22 +36,10 @@ function genome.crossOver(genomes)
   return rt
 end
 
-function genome.pad(genome, geneMax)
-  for i = 1, geneMax do
-    if genome[i] == nil then genome[i] = math.random(0, 4) end
-  end
-  return genome
-end
-
 function genome.mutate(genome)
   local mutateIndex = math.random(1, table.getn(genome))
   genome[mutateIndex] = math.random(0, 4)
   return genome
-end
-
-function genomes.trunc(genomes, size)
-  for i = size + 1, table.getn(genomes) do genomes[i] = nil end
-  return genomes
 end
 
 function genomes.sortByBests(genomes, bests)
@@ -93,15 +69,3 @@ function genomes.sortByScores(pgenomes, scores)
   end
   return genomes.sortByBests(pgenomes, bests)
 end
-
-function genomes.pad(genomes, genomeMax, geneMax)
-  for i = 1, genomeMax do
-    if genomes[i] == nil then 
-      genomes[i] = genome.make(geneMax)
-    else
-      genome.pad(genomes[i], geneMax)
-    end
-  end
-  return genomes
-end
-
