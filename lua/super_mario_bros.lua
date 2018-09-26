@@ -44,12 +44,12 @@ end
 
 function mario.getWorld()
   local world = memory.readbyte(0x75f)
-  return world or 0
+  return (world + 1) or 1
 end
 
 function mario.getLevel()
   local level = memory.readbyte(0x75c)
-  return level or 0
+  return (level + 1) or 1
 end
 
 
@@ -69,7 +69,7 @@ function mario.isDead()
   return rt
 end
 
-function mario.getMaxDist(currentMax, scores)
+function mario.getMaxScore(currentMax, scores)
   local rt = currentMax
   for i = 1, table.getn(scores) do
     if scores[i] > rt then rt = scores[i] end
@@ -84,15 +84,22 @@ function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   end
 end
 
-function hud(generation, genome, maxDist, curDist)
+function hud(generation, genome, maxScore)
   gui.text(0, 0, "generation")
   gui.text(50, 0, generation)
   gui.text(0, 10, "genome")
   gui.text(50, 10, genome)
-  gui.text(150, 0, "max. dist")
-  gui.text(200, 0, maxDist)
-  gui.text(150, 10, "cur. dist")
-  gui.text(200, 10, curDist)
+  gui.text(0, 40, "world")
+  gui.text(0, 50, "level")
+  gui.text(50, 40, mario.getWorld())
+  gui.text(50, 50, mario.getLevel())
+  gui.text(150, 0, "max. score")
+  gui.text(210, 0, maxScore)
+  gui.text(150, 10, "cur. score")
+  gui.text(210, 10, mario.getPosition() + (mario.getLevel() * 2700))
+  gui.text(150, 40, "cur. position")
+  gui.text(210, 40, mario.getPosition())
+
 end
 
 function frameEnd()
@@ -108,7 +115,7 @@ function main()
   local generationIndex = 1
   local genomeIndex = 1
   local geneIndex = 1
-  local maxDist = 0
+  local maxScore = 0
   _genomes = genomes.add()
   local scores = { 0 }
   mario.start()
@@ -119,8 +126,8 @@ function main()
       if _genomes[genomeIndex][geneIndex] == nil then genome.add(_genomes[genomeIndex]) end
     else joypadUpdate(_genomes[genomeIndex][geneIndex]) end
     if mario.isDead() then
-      scores[genomeIndex] = mario.getPosition()
-      maxDist = mario.getMaxDist(maxDist, scores)
+      scores[genomeIndex] = mario.getPosition() + (mario.getLevel() * 2700)
+      maxScore = mario.getMaxScore(maxScore, scores)
       genomeIndex = genomeIndex + 1
       if _genomes[genomeIndex] == nil then genomes.add(_genomes) end
       geneIndex = 1
@@ -134,7 +141,7 @@ function main()
       emu.softreset()
       mario.start()
     end
-    hud(generationIndex, genomeIndex, maxDist, mario.getPosition())
+    hud(generationIndex, genomeIndex, maxScore)
     frameEnd()
   end
 end
