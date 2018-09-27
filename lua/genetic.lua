@@ -10,9 +10,10 @@ genome = {}
 genomes = {}
 
 function genome.add(genome)
-  genome = genome or {}
-  table.insert(genome, math.random(0, 4))
-  return genome
+  if genome ~= nil then
+    table.insert(genome, math.random(0, 4))
+  end
+  return genome or {}
 end
 
 function genomes.add(genomes)
