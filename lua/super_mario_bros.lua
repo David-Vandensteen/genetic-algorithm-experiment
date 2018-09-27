@@ -11,13 +11,34 @@
 require "lua-extend"
 require "genetic"
 
---Supported are "normal","turbo","nothrottle","maximum"
---SPEED = "normal"
---SPEED = "turbo"
-SPEED = "maximum"
-frameCount = 0
+game = {}
+game.frameCount = 0
+game.settings = {}
+--Speed Supported are "normal","turbo","nothrottle","maximum"
+game.settings.speed = {}
+game.settings.speed.value = "normal"
+game.settings.speed.set = {}
+function game.settings.speed.set.maximum() end
+function game.settings.speed.set.turbo() end
+function game.settings.speed.set.normal() end
+game.settings.joypad = {}
+game.settings.joypad.rate = 40
+game.genetic = {}
+game.genetic.settings = {}
+game.genetic.settings.genomes = {}
+game.genetic.settings.gene = {}
+game.genetic.settings.genomes.max = 10
+game.genetic.scores = {}
+game.genetic.scores.values = {}
+game.genetic.scores.max = 0
+function game.genetic.scores.set(value) table.insert(game.genetic.scores.values, value) end
+game.genetic.generation = {}
+game.genetic.generation.index = 1
+game.genetic.genomes = {}
 
-function wait(frameMax) for i = 0, frameMax do frameEnd() end end
+--
+
+function wait(frameMax) for i = 1, frameMax do frameEnd() end end
 
 function joypadUpdate(value)
   if value == 0 then joypad.write(1, {A = false, right = true, left = false, down = false}) end
@@ -29,7 +50,7 @@ end
 
 function init()
   emu.softreset()
-  if SPEED then emu.speedmode(SPEED) end
+  emu.speedmode(game.settings.speed.value)
 end
 
 -- Mario Bros Functions
@@ -51,7 +72,6 @@ function mario.getLevel()
   local level = memory.readbyte(0x75c)
   return (level + 1) or 1
 end
-
 
 function mario.getPosition()
   local marioX = memory.readbyte(0x6D) * 0x100 + memory.readbyte(0x86)
@@ -77,6 +97,8 @@ function mario.getMaxScore(currentMax, scores)
   return rt
 end
 
+function mario.getScore() return mario.getPosition() + (mario.getLevel() * 10000) end
+
 function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   genomes.sortByScores(pgenomes, scores)
   for i = 1, (table.getn(pgenomes) - 2) do
@@ -84,64 +106,65 @@ function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   end
 end
 
-function hud(generation, genome, maxScore)
+function mario.hud(_genomesIndex)
   gui.text(0, 0, "generation")
-  gui.text(50, 0, generation)
+  gui.text(50, 0, game.genetic.generation.index)
   gui.text(0, 10, "genome")
-  gui.text(50, 10, genome)
+  gui.text(50, 10, _genomesIndex)
   gui.text(0, 40, "world")
   gui.text(0, 50, "level")
   gui.text(50, 40, mario.getWorld())
   gui.text(50, 50, mario.getLevel())
   gui.text(150, 0, "max. score")
-  gui.text(210, 0, maxScore)
+  gui.text(210, 0, game.genetic.scores.max)
   gui.text(150, 10, "cur. score")
-  gui.text(210, 10, mario.getPosition() + (mario.getLevel() * 2700))
+  gui.text(210, 10, mario.getScore())
   gui.text(150, 40, "cur. position")
   gui.text(210, 40, mario.getPosition())
-
 end
 
 function frameEnd()
-  frameCount = frameCount + 1
+  game.frameCount = game.frameCount + 1
   emu.frameadvance()
 end
 
 function main()  
   init()
-  local GENOME_MAX = 10
-  local GENE_MAX = 1000
-  local JOYPAD_RATE = 40
-  local generationIndex = 1
-  local genomeIndex = 1
+  local genomesIndex = 1
   local geneIndex = 1
-  local maxScore = 0
-  _genomes = genomes.add()
-  local scores = { 0 }
+  game.genetic.genomes[genomesIndex] = {}
+  gene.add(game.genetic.genomes[genomesIndex])
   mario.start()
   while true do
-    mario.getPosition()
-    if (frameCount % JOYPAD_RATE) == 0 then 
-      geneIndex = geneIndex + 1      
-      if _genomes[genomeIndex][geneIndex] == nil then genome.add(_genomes[genomeIndex]) end
-    else joypadUpdate(_genomes[genomeIndex][geneIndex]) end
+    emu.print(game.genetic.genomes)
     if mario.isDead() then
-      scores[genomeIndex] = mario.getPosition() + (mario.getLevel() * 2700)
-      maxScore = mario.getMaxScore(maxScore, scores)
-      genomeIndex = genomeIndex + 1
-      if _genomes[genomeIndex] == nil then genomes.add(_genomes) end
-      geneIndex = 1
-      if genomeIndex > GENOME_MAX then
-        mario.fitness(_genomes, scores, GENOME_MAX, GENE_MAX)
-        emu.print(scores)
+      game.genetic.scores.set(mario.getScore())
+      if genomesIndex > game.genetic.settings.genomes.max then
+        game.genetic.generation.index = game.genetic.generation.index + 1
+        genomesIndex = 1
         geneIndex = 1
-        genomeIndex = 1
-        generationIndex = generationIndex + 1
-      end  
+        game.genetic.genomes[genomesIndex] = {}
+        gene.add(game.genetic.genomes[geneIndex])
+        emu.print(game.genetic.scores.values)
+      else
+        genomesIndex = genomesIndex + 1
+        geneIndex = 1
+        game.genetic.genomes[genomesIndex] = {}
+        gene.add(game.genetic.genomes[geneIndex])
+      end
+      emu.print("MARIO IS DEAD")
       emu.softreset()
       mario.start()
+    else
+      if (game.frameCount % game.settings.joypad.rate) == 0 then
+        gene.add(game.genetic.genomes[genomesIndex])
+        geneIndex = geneIndex + 1
+      end
+      joypadUpdate(game.genetic.genomes[genomesIndex][geneIndex])  
     end
-    hud(generationIndex, genomeIndex, maxScore)
+    emu.print(genomesIndex)
+    emu.print(geneIndex)
+    mario.hud(genomesIndex)
     frameEnd()
   end
 end

@@ -36,8 +36,8 @@ printTable(table.trunc({ 10, 11, 12, 20, 25}, 4))
 print("")
 
 print("genome.mutate() test")
-local g = genome.add()
-for i = 1, 20 do genome.add(g) end
+local g = {}
+for i = 1, 20 do gene.add(g) end
 printTable(g)
 genome.mutate(g)
 printTable(g)
@@ -49,38 +49,53 @@ printTable(gc)
 print("")
 
 print("genomes.sortByBests() test")
-local gs = genomes.add()
+local gs = {}
 for j = 1, 10 do
+  gs[j] = {}
   for i = 1, 10 do
-    genome.add(gs[j])
+    gene.add(gs[j])
   end
-  genomes.add(gs)
 end
 printGenomes(gs)
 print("")
 
---print("genomeScores test")
---print("genomes.make(10, 3)")
---local genomesM = genomes.make(10, 3)
+print("table sort")
+local b = {   math.random( 1,10), math.random( 1,10), math.random( 1,10),
+              math.random( 1,10), math.random( 1,10), math.random( 1,10),
+              math.random( 1,10), math.random( 1,10), math.random( 1,10),
+              math.random( 1,10)
+          }
+printTable(b)
+print("")
+print("grenomes sort")
+genomes.sortByBests(gs, b)
+printGenomes(gs)
+print("")
 
---printGenomes(genomesM)
---local bests = { 4, 3 ,2 ,1 ,6 ,5 ,9 ,8, 7, 10 }
---print("best genome table")
---printTable(bests)
---print("genomes.sortByBests(genomesM, bests)")
---printGenomes(genomes.sortByBests(genomesM, bests))
---print("genomes.sortByScores(genomesM, scores)")
---local scores = { 300, 250, 120, 600, 900, 270, 535, 699, 50, 122 }
---printTable(scores)
---printGenomes(genomes.sortByScores(genomesM, scores))
---print("")
+print("genomes.sortByScores() test")
+local gs = {}
+for j = 1, 10 do
+  gs[j] = {}
+  for i = 1, 10 do
+    gene.add(gs[j])
+  end
+end
+printGenomes(gs)
+print("")
+local s = {   math.random( 100,1000), math.random( 100,1000), math.random( 100,1000),
+              math.random( 100,1000), math.random( 100,1000), math.random( 100,1000),
+              math.random( 100,1000), math.random( 100,1000), math.random( 100,1000),
+              math.random( 100,1000)
+          }
+printTable(s)
+print("")
+print("genomes sort")
+genomes.sortByScores(gs, s)
+printGenomes(gs)
+print("")
 
 --print("genomesTrunc(genomes, 3) test")
 --printGenomes(genomes.trunc(genomesM, 3))
---print("")
-
---print("genomes.pad(genomes, 10, 10) test")
---printGenomes(genomes.pad(genomesM,10, 10))
 --print("")
 
 --print("logger test")
@@ -92,30 +107,3 @@ print("")
 --logger.info("Hello genomes")
 --logger.genomes(genomesM)
 --print("")
-
-print("genome add test")
-local g = genome.add()
-printTable(g)
-genome.add(g)
-printTable(g)
-print("add")
-genome.add(g)
-printTable(g)
-print("add")
-genome.add(g)
-printTable(g)
-print("add")
-genome.add(g)
-printTable(g)
-print("")
-
-print("genomes add test")
-local gs = genomes.add()
-genome.add(gs[1])
-genome.add(gs[1])
-genome.add(gs[1])
-genome.add(gs[1])
-printGenomes(gs)
-genomes.add(gs)
-printGenomes(gs)
-print("")

@@ -8,18 +8,18 @@
 --]]
 genome = {}
 genomes = {}
+gene = {}
 
-function genome.add(genome)
-  if genome ~= nil then
-    table.insert(genome, math.random(0, 4))
-  end
-  return genome or {}
+function gene.add(_genome)
+  local val = math.random(0, 4)
+  if _genome ~= nil then table.insert(_genome, val) end
+  return _genome or val
 end
 
-function genomes.add(genomes)
-  genomes = genomes or {}
-  table.insert(genomes, genome.add())
-  return genomes
+function genomes.add(_genomes)
+  rt = _genomes or {}
+  table.insert(rt, genome.add())
+  return rt
 end
 
 function genome.crossOver(genomes)
@@ -43,11 +43,11 @@ function genome.mutate(genome)
   return genome
 end
 
-function genomes.sortByBests(genomes, bests)
+function genomes.sortByBests(_genomes, _bests)
   local rt = {}
-  for i = 1, table.getn(genomes) do rt[i] = genomes[bests[i]] end
-  genomes = table.copy(rt)
-  return rt
+  for i = 1, table.getn(_genomes) do rt[i] = table.copy(_genomes[_bests[i]]) end
+  for i = 1, table.getn(rt) do  _genomes[i] = table.copy(rt[i]) end
+  return _genomes
 end
 
 function genomes.sortByScores(pgenomes, scores)
