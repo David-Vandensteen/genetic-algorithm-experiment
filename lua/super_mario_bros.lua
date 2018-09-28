@@ -10,35 +10,14 @@
 
 require "lua-extend"
 require "genetic"
+require "super_mario_bros-settings"
 
-game = {}
-game.frameCount = 0
-game.settings = {}
---Speed Supported are "normal","turbo","nothrottle","maximum"
-game.settings.speed = {}
-game.settings.speed.value = "normal"
-game.settings.speed.set = {}
-function game.settings.speed.set.maximum() end
-function game.settings.speed.set.turbo() end
-function game.settings.speed.set.normal() end
-game.settings.joypad = {}
-game.settings.joypad.rate = 40
-game.genetic = {}
-game.genetic.settings = {}
-game.genetic.settings.genomes = {}
-game.genetic.settings.gene = {}
-game.genetic.settings.genomes.max = 10
-game.genetic.scores = {}
-game.genetic.scores.values = {}
-game.genetic.scores.max = 0
-function game.genetic.scores.set(value) table.insert(game.genetic.scores.values, value) end
-game.genetic.generation = {}
-game.genetic.generation.index = 1
-game.genetic.genomes = {}
-
---
-
-function wait(frameMax) for i = 1, frameMax do frameEnd() end end
+function wait(frameMax)
+  local curF = emu.framecount()
+  while emu.framecount() < curF + frameMax do
+    emu.frameadvance()
+  end
+end
 
 function joypadUpdate(value)
   if value == 0 then joypad.write(1, {A = false, right = true, left = false, down = false}) end
@@ -58,9 +37,9 @@ local mario = {}
 function mario.start()
   wait(50)
   joypad.write(1, {start = true})
-  frameEnd()
+  emu.frameadvance()
   joypad.write(1, {start = true})
-  frameEnd()
+  emu.frameadvance()
 end
 
 function mario.getWorld()
@@ -84,7 +63,7 @@ function mario.isDead()
   local rt = false
   while (memory.readbyte(deathMusicLoaded) == 0x01 or memory.readbyte(playerState) == 0x0B) do
     rt = true
-    frameEnd()
+    emu.frameadvance()
   end
   return rt
 end
@@ -123,11 +102,6 @@ function mario.hud(_genomesIndex)
   gui.text(210, 40, mario.getPosition())
 end
 
-function frameEnd()
-  game.frameCount = game.frameCount + 1
-  emu.frameadvance()
-end
-
 function main()  
   init()
   local genomesIndex = 1
@@ -156,7 +130,7 @@ function main()
       emu.softreset()
       mario.start()
     else
-      if (game.frameCount % game.settings.joypad.rate) == 0 then
+      if (emu.framecount() % game.settings.joypad.rate) == 0 then
         gene.add(game.genetic.genomes[genomesIndex])
         geneIndex = geneIndex + 1
       end
@@ -165,7 +139,7 @@ function main()
     emu.print(genomesIndex)
     emu.print(geneIndex)
     mario.hud(genomesIndex)
-    frameEnd()
+    emu.frameadvance()
   end
 end
 main()
