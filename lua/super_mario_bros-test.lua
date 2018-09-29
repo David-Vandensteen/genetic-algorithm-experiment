@@ -6,10 +6,7 @@
     Mario Bros agent "simulation" for testing without FCEUX
 --]]
 
-require "lua-extend"
-function printGenomes(genomes)
-  for i = 1, table.getn(genomes) do printTable(genomes[i]) end
-end
+local inspect = require "inspect"
 
 genetic = {
   genomes = {},
@@ -42,7 +39,17 @@ genetic = {
   mutate = function(self) end,
 
   setScore = function(self, score)
-    if not self:generationIsFinish() then table.insert(self.scores, score) end
+    local ranking = 10    
+    if not self:generationIsFinish() then
+      table.insert(
+        self.scores,
+        { 
+          id = self:getGenomeIndex(),
+          score = score, ranking = ranking,
+          genome = self.genomes[self:getGenomeIndex()] 
+        }
+      )
+    end
   end,
 
   sort = function(self)
@@ -78,14 +85,32 @@ function main()
       genetic:addGenome()
     end
     if genetic:generationIsFinish() then print("    ------ GENERATION END") end
-    print("genomes")
-    printGenomes(genetic.genomes)
+    print("generation : ", genetic.generationIndex)
+    print("genomes : ", genetic:getGenomeIndex())
+    --printGenomes(genetic.genomes)
+    print(inspect(genetic.genomes))
     print("")
     print("scores")
-    printTable(genetic.scores)
+    print(inspect(genetic.scores))
     print("")
-    print("scores sort")
-    printTable(genetic:sort())
+
+
+
+
+    print("sort table test")
+    local bestScore = {}
+    for i = 1, table.getn(genetic.scores) do table.insert(bestScore, genetic.scores[i].score) end
+
+    print("best table to sort")
+    print(inspect(bestScore))
+    print("")
+
+    print("best table sorted")
+    table.sort(bestScore, function (a, b) return a > b end)
+    print(inspect(bestScore))
+    print("")
+
+    print("")
     print("-------------------------------------- cycle end --")
     io.read()
   end
