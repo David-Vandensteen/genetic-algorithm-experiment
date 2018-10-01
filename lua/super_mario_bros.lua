@@ -8,9 +8,23 @@
 
 --]]
 
+local inspect = require "inspect"
 require "lua-extend"
 require "genetic"
-require "super_mario_bros-settings"
+require "logger"
+
+game = {}
+game.settings = {}
+--Speed Supported are "normal","turbo","nothrottle","maximum"
+game.settings.speed = {}
+game.settings.speed.value = "turbo"
+game.settings.speed.set = {}
+function game.settings.speed.set.maximum() end
+function game.settings.speed.set.turbo() end
+function game.settings.speed.set.normal() end
+game.settings.joypad = {}
+game.settings.joypad.rate = 40
+
 
 function wait(frameMax)
   local curF = emu.framecount()
@@ -85,61 +99,80 @@ function mario.fitness(pgenomes, scores, genomeMax, geneMax)
   end
 end
 
-function mario.hud(_genomesIndex)
+function mario.hud()
   gui.text(0, 0, "generation")
-  gui.text(50, 0, game.genetic.generation.index)
+  gui.text(50, 0, genetic.generationIndex)
   gui.text(0, 10, "genome")
-  gui.text(50, 10, _genomesIndex)
+  gui.text(50, 10, genetic.genomeIndex)
   gui.text(0, 40, "world")
   gui.text(0, 50, "level")
   gui.text(50, 40, mario.getWorld())
   gui.text(50, 50, mario.getLevel())
   gui.text(150, 0, "max. score")
-  gui.text(210, 0, game.genetic.scores.max)
+  --gui.text(210, 0, game.genetic.scores.max)
   gui.text(150, 10, "cur. score")
   gui.text(210, 10, mario.getScore())
   gui.text(150, 40, "cur. position")
   gui.text(210, 40, mario.getPosition())
 end
 
+function updateLog()
+  emu.print("GENERATION : ", genetic.generationIndex)
+  emu.print(genetic.scores)
+  logger.info("-- GENERATION : ")
+  logger.info(genetic.generationIndex)
+  logger.info("--")
+  logger.info(inspect(genetic.genomes))
+  logger.info("")
+  genetic:sort() --TODO
+  logger.info("-- SCORES :")
+  logger.info(inspect(genetic.scores))
+  logger.info("")
+  logger.info("-------------------------------------------")
+  logger.info("")
+end
+
 function main()  
+  genetic.genomeMax = 10
+  genetic:addGenome()
+  genetic:processGene()
+  logger.setFile("super_mario_bros.log")
+  logger.clear()
+  logger.info(os.date())
+  logger.info("")
+  local control = 0
   init()
-  local genomesIndex = 1
-  local geneIndex = 1
-  game.genetic.genomes[genomesIndex] = {}
-  gene.add(game.genetic.genomes[genomesIndex])
   mario.start()
   while true do
-    emu.print(game.genetic.genomes)
+    if (emu.framecount() % game.settings.joypad.rate) == 0 then
+      control = genetic:processGene()
+    end
+    joypadUpdate(control)
     if mario.isDead() then
-      game.genetic.scores.set(mario.getScore())
-      if genomesIndex > game.genetic.settings.genomes.max then
-        game.genetic.generation.index = game.genetic.generation.index + 1
-        genomesIndex = 1
-        geneIndex = 1
-        game.genetic.genomes[genomesIndex] = {}
-        gene.add(game.genetic.genomes[geneIndex])
-        emu.print(game.genetic.scores.values)
-      else
-        genomesIndex = genomesIndex + 1
-        geneIndex = 1
-        game.genetic.genomes[genomesIndex] = {}
-        gene.add(game.genetic.genomes[geneIndex])
+      genetic:setScore(mario.getScore())
+      genetic:addGenome()
+      if genetic:generationIsFinish() then
+        updateLog()
+        genetic:clearGenomes()
+        -- copy the bests
+        for j = 1, table.getn(genetic.scores) do
+          for i = 1, 4 do
+            if genetic.scores[j].ranking == i then
+              genetic.genomes[i] = table.copy(genetic.scores[j].genome)
+              table.trunc(genetic.genomes[i], table.getn(genetic.genomes[i]) - 3)
+            end
+          end
+        end
+        genetic:addGeneration()
+        --control = genetic:processGene()
+        wait(50)
       end
-      emu.print("MARIO IS DEAD")
       emu.softreset()
       mario.start()
-    else
-      if (emu.framecount() % game.settings.joypad.rate) == 0 then
-        gene.add(game.genetic.genomes[genomesIndex])
-        geneIndex = geneIndex + 1
-      end
-      joypadUpdate(game.genetic.genomes[genomesIndex][geneIndex])  
     end
-    emu.print(genomesIndex)
-    emu.print(geneIndex)
-    mario.hud(genomesIndex)
+    mario.hud()
     emu.frameadvance()
   end
 end
+
 main()

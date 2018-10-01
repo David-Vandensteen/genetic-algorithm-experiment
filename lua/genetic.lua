@@ -6,67 +6,82 @@
     Genetic lib for LUA
 
 --]]
-genome = {}
-genomes = {}
-gene = {}
+require "lua-extend"
 
-function gene.add(_genome)
-  local val = math.random(0, 4)
-  if _genome ~= nil then table.insert(_genome, val) end
-  return _genome or val
-end
+genetic = {
+  genomes = {},
+  scores = {},
+  genomeIndex = 0,
+  geneIndex = 0,
+  generationIndex = 1,
+  genomeMax = 10,
 
-function genomes.add(_genomes)
-  rt = _genomes or {}
-  table.insert(rt, genome.add())
-  return rt
-end
+  generationIsFinish = function(self)
+    local rt = false
+      if self.genomeIndex > self.genomeMax then
+      rt = true
+    else
+      rt = false
+    end
+    return rt
+  end,
 
-function genome.crossOver(genomes)
-  local rt = {}
-  if table.getn(genomes[1]) > table.getn(genomes[1]) then maxRandom = table.getn(genomes[1])
-    else maxRandom = table.getn(genomes[2])
-  end
-  local cutIndex = math.random(0, maxRandom)
-  for i = 0, cutIndex do
-    rt[i] = genomes[1][i]
-  end
-  for i = cutIndex, table.getn(genomes[2]) do
-    rt[i] = genomes[2][i]
-  end
-  return rt
-end
+  addGeneration = function(self)
+    self.generationIndex = self.generationIndex + 1
+    self.genomeIndex = 0
+    self.geneIndex = 0
+    self.scores = {}
+    self:addGenome()
+    return self.generationIndex
+  end,
 
-function genome.mutate(genome)
-  local mutateIndex = math.random(1, table.getn(genome))
-  genome[mutateIndex] = math.random(0, 4)
-  return genome
-end
+  clearGenomes = function(self) self.genomes = {} end,
 
-function genomes.sortByBests(_genomes, _bests)
-  local rt = {}
-  for i = 1, table.getn(_genomes) do rt[i] = table.copy(_genomes[_bests[i]]) end
-  for i = 1, table.getn(rt) do  _genomes[i] = table.copy(rt[i]) end
-  return _genomes
-end
-
-function genomes.sortByScores(pgenomes, scores)
-  local bests = {}
-  for i = 1, table.getn(scores) do
-    bests[i] = i
-  end
-  for i = 1, table.getn(scores) do
-    for j = 1, table.getn(scores) do
-      if scores[i] > scores[j] then
-        tmp = scores[i]
-        scores[i] = scores[j]
-        scores[j] = tmp
-        
-        tmpBest = bests[i]
-        bests[i] = bests[j]
-        bests[j] = tmpBest
+  processGene = function(self)
+    if not self:generationIsFinish() then
+      self.geneIndex = self.geneIndex + 1
+      if not self.genomes[self.genomeIndex][self.geneIndex] then
+        table.insert(self.genomes[self.genomeIndex], math.random(0, 4))
       end
     end
-  end
-  return genomes.sortByBests(pgenomes, bests)
-end
+    return self.genomes[self.genomeIndex][self.geneIndex]
+  end,
+
+  addGenome = function(self)
+    if not self:generationIsFinish() then
+      self.genomeIndex = self.genomeIndex + 1
+      self.geneIndex = 0
+      if not self.genomes[self.genomeIndex] then table.insert(self.genomes, {}) end
+    end
+    return self.genomes[self.genomeIndex]
+  end,
+
+  crossOver = function(self, index1, index2) end,
+
+  mutate = function(self) end,
+
+  setScore = function(self, score)
+    local ranking = 0
+    if not self:generationIsFinish() then
+      table.insert(
+        self.scores,
+        { 
+          id = self.genomeIndex,
+          score = score,
+          genome = table.copy(self.genomes[self.genomeIndex])
+        }
+      )
+    end
+  end,
+
+  sort = function(self)
+    local bestScore = {}
+    for i = 1, table.getn(self.scores) do table.insert(bestScore, self.scores[i].score) end
+    table.sort(bestScore, function (a, b) return a > b end)
+    for i = 1, table.getn(bestScore) do
+      for j = 1, table.getn(self.scores) do
+        if bestScore[i] == self.scores[j].score then self.scores[j].ranking = i end
+      end
+    end
+  end,
+}
