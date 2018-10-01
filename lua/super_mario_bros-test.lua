@@ -7,6 +7,7 @@
 --]]
 
 local inspect = require "inspect"
+require "lua-extend"
 
 genetic = {
   genomes = {},
@@ -26,9 +27,11 @@ genetic = {
     return rt
   end,
 
+  clearGenomes = function(self) self.genomes = {} end,
+
   processGene = function(self)
-    self.geneIndex = self.geneIndex + 1
     if not self:generationIsFinish() then
+      self.geneIndex = self.geneIndex + 1
       if not self.genomes[self.genomeIndex][self.geneIndex] then
         table.insert(self.genomes[self.genomeIndex], math.random(0, 4))
       end
@@ -36,18 +39,13 @@ genetic = {
     return self.genomes[self.genomeIndex][self.geneIndex]
   end,
 
-  processGenome = function(self)
-  end,
-
-  addGene = function(self)
-    self.geneIndex = self.geneIndex + 1
-    if not self:generationIsFinish() then table.insert(self.genomes[self.genomeIndex], math.random(0, 4)) end
-  end,
-
   addGenome = function(self)
-    self.genomeIndex = self.genomeIndex + 1
-    self.geneIndex = 0
-    if not self:generationIsFinish() then table.insert(self.genomes, {}) end
+    if not self:generationIsFinish() then
+      self.genomeIndex = self.genomeIndex + 1
+      self.geneIndex = 0
+      if not self.genomes[self.genomeIndex] then table.insert(self.genomes, {}) end
+    end
+    return self.genomes[self.genomeIndex]
   end,
 
   crossOver = function(self, index1, index2) end,
@@ -62,7 +60,7 @@ genetic = {
         { 
           id = self.genomeIndex,
           score = score,
-          genome = self.genomes[self.genomeIndex] 
+          genome = table.copy(self.genomes[self.genomeIndex])
         }
       )
     end
@@ -85,15 +83,40 @@ function main()
   genetic:addGenome()
   while true do
     print("------------------------------------- cycle start --")
-    --genetic:addGene()
     genetic:processGene()
     if math.random(0, 9) == 0 then
       genetic:setScore(math.random(100, 10000))
-      genetic:sort()
       genetic:addGenome()
     end
     if genetic:generationIsFinish() then
       print("    ------ GENERATION END")      
+      genetic:sort()
+      print("scores")
+      print(inspect(genetic.scores))
+      print("")
+      print("clear genomes")
+      genetic:clearGenomes()
+      print("")
+      print("print genomes")
+      print(inspect(genetic.genomes))
+      print("")
+      print("copy the 2 bests genomes")
+      for j = 1, table.getn(genetic.scores) do
+        for i = 1, 2 do
+          if genetic.scores[j].ranking == i then
+            genetic.genomes[i] = table.copy(genetic.scores[j].genome)
+          end
+        end
+      end
+      print("")
+      print("print genomes")
+      print(inspect(genetic.genomes))
+      print("")
+      print("reset index")
+      genetic.genomeIndex = 0
+      genetic.geneIndex = 0
+      genetic.generationIndex = genetic.generationIndex + 1
+      genetic:addGenome()
     end
     print("generation : ", genetic.generationIndex)
     print("genome : ", genetic.genomeIndex)
@@ -101,8 +124,6 @@ function main()
     print("")
     print(inspect(genetic.genomes))
     print("")
-    print("scores")
-    print(inspect(genetic.scores))
     print("")
 
     print("")
