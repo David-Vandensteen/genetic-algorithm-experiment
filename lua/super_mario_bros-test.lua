@@ -11,6 +11,11 @@ require "lua-extend"
 require "genetic"
 require "logger"
 
+simul = {
+  frame = 0
+}
+
+
 game = {}
 game.settings = {}
 --Speed Supported are "normal","turbo","nothrottle","maximum"
@@ -24,11 +29,14 @@ game.settings.joypad = {}
 game.settings.joypad.rate = 40
 
 
-
 mario = {}
 emu = {}
 joypad ={}
 gui = {}
+
+function emu.softreset()
+  print("emu.softreset()")
+end
 
 function gui.text(x, y, msg) print(msg) end
 
@@ -37,19 +45,26 @@ function joypad.write()
 end
 
 function emu.framecount()
-  print("emu.framecount()")
-  return 1
+  print("frame : ", simul.frame)
+  return simul.frame
 end
 
 function emu.frameadvance()
+  simul.frame = simul.frame + 1
   io.read()
+  return simul.frame
 end
 
-function mario.start()
-  print("mario.start()")
+function emu.print(arg) print(arg) end
+
+function mario.start() print("mario.start()") end
+
+function mario.isDead()
+  local rt = false
+  if math.random(1, 9) == 1 then rt = true end
+  return rt
 end
 
-function mario.isDead() end
 function mario.getWorld() return 1 end
 function mario.getLevel() return 1 end
 function mario.getScore() return 1 end
@@ -91,6 +106,22 @@ function joypadUpdate(value)
   if value == 4 then joypad.write(1, {A = true, right = true, left = false, down = true}) end
 end
 
+function updateLog()
+  emu.print("GENERATION : ", genetic.generationIndex)
+  emu.print(genetic.scores)
+  logger.info("-- GENERATION : ")
+  logger.info(genetic.generationIndex)
+  logger.info("--")
+  logger.info(inspect(genetic.genomes))
+  logger.info("")
+  genetic:sort() --TODO
+  logger.info("-- SCORES :")
+  logger.info(inspect(genetic.scores))
+  logger.info("")
+  logger.info("-------------------------------------------")
+  logger.info("")
+end
+
 function main()  
   genetic.genomeMax = 10
   genetic:addGenome()
@@ -103,6 +134,7 @@ function main()
   init()
   mario.start()
   while true do
+    print(inspect(genetic.genomes))
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
       control = genetic:processGene()
     end
@@ -134,4 +166,22 @@ function main()
   end
 end
 
+function test()
+  while true do
+    --genetic:addGeneration()
+    genetic:addGenome()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    genetic:processGene()
+    print(inspect(genetic.genomes))
+    emu.frameadvance()
+  end
+end
+
 main()
+--test()
