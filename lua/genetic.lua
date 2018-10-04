@@ -9,11 +9,27 @@
 require "lua-extend"
 
 genetic = {
+  generationMax = 10,
+  genomeMax = 10,
+  generationIndex = 0,
+  genomeIndex = 0,
+  geneIndex = 0,
+  generations = {
+    genomes = {},
+  },
+}
+
+function genetic.generations.add()
+  print("generations.add()")
+end
+
+--[[
+genetic = {
   genomes = {},
   scores = {},
   genomeIndex = 0,
   geneIndex = 0,
-  generationIndex = 1,
+  generationIndex = 0,
   genomeMax = 10,
 
   generationIsFinish = function(self)
@@ -31,7 +47,6 @@ genetic = {
     self.genomeIndex = 0
     self.geneIndex = 0
     self.scores = {}
-    self:addGenome()
     return self.generationIndex
   end,
 
@@ -85,3 +100,4 @@ genetic = {
     end
   end,
 }
+]]--

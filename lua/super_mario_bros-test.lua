@@ -123,65 +123,14 @@ function updateLog()
 end
 
 function main()  
-  genetic.genomeMax = 10
-  genetic:addGenome()
-  genetic:processGene()
-  logger.setFile("super_mario_bros.log")
-  logger.clear()
-  logger.info(os.date())
-  logger.info("")
-  local control = 0
-  init()
-  mario.start()
-  while true do
-    print(inspect(genetic.genomes))
-    if (emu.framecount() % game.settings.joypad.rate) == 0 then
-      control = genetic:processGene()
-    end
-    joypadUpdate(control)
-    if mario.isDead() then
-      genetic:setScore(mario.getScore())
-      genetic:addGenome()
-      if genetic:generationIsFinish() then
-        updateLog()
-        genetic:clearGenomes()
-        -- copy the bests
-        for j = 1, table.getn(genetic.scores) do
-          for i = 1, 4 do
-            if genetic.scores[j].ranking == i then
-              genetic.genomes[i] = table.copy(genetic.scores[j].genome)
-              table.trunc(genetic.genomes[i], table.getn(genetic.genomes[i]) - 3)
-            end
-          end
-        end
-        genetic:addGeneration()
-        --control = genetic:processGene()
-        wait(50)
-      end
-      emu.softreset()
-      mario.start()
-    end
-    mario.hud()
-    emu.frameadvance()
-  end
 end
 
 function test()
   while true do
-    --genetic:addGeneration()
-    genetic:addGenome()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    genetic:processGene()
-    print(inspect(genetic.genomes))
+    --genetic:generations.add()
     emu.frameadvance()
   end
 end
 
-main()
---test()
+--main()
+test()
