@@ -127,7 +127,13 @@ end
 
 function test()
   while true do
-    --genetic:generations.add()
+    genetic.generation:add()
+    genetic.generation.genome:add()
+    genetic.generation.genome:processGene()
+
+    genetic.generation.genome:setScore()
+    genetic.generation:sort()
+
     emu.frameadvance()
   end
 end
