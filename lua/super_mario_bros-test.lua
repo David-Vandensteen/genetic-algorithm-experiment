@@ -127,13 +127,8 @@ end
 
 function test()
   while true do
-    genetic.generation:add()
-    genetic.generation.genome:add()
-    genetic.generation.genome:processGene()
-
-    genetic.generation.genome:setScore()
-    genetic.generation:sort()
-
+    genetic:addGeneration()
+    print(inspect(genetic.genomes))
     emu.frameadvance()
   end
 end
