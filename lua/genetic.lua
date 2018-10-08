@@ -8,19 +8,61 @@
 --]]
 require "lua-extend"
 
-genetic = {
-  generationMax = 0,  --unlimited
-  genomeMax = 10,
-}
+genetic = {}
 
-genome = {}
-
-function genome.process(self)
-
+function newGenetic(_genomeMax)
+  genetic.genomeMax = _genomeMax
+  genetic.geneIndex = 1
+  genetic.genomeIndex = 1
+  genetic.genome = {}
+  genetic.genomes = {}
+  genetic.generations = {}
+  genetic.generationIndex = 1 
 end
 
+function newGenome()
+  genetic.genome = {}
+end
 
+function geneProcess(_gene)
+  table.insert(genetic.genome, _gene)
+  genetic.geneIndex = genetic.geneIndex + 1
+  return _gene
+end
 
+function genomeCopy(_genome)
+  local rt = {}
+  for i = 1, table.getn(_genome) do table.insert(rt, _genome[i]) end
+  return rt
+end
+
+function genomesCopy(_genomes)
+  local rt = {}
+  for i = 1, table.getn(_genomes) do table.insert(rt, genomeCopy(_genomes[i])) end
+  return rt
+end
+
+function genomeProcess()
+  genetic.genomes[genetic.genomeIndex] = genomeCopy(genetic.genome)
+  genetic.genomeIndex = genetic.genomeIndex + 1
+  genetic.geneIndex = 1
+end
+
+function generationProcess()
+  genetic.generationIndex = genetic.generationIndex + 1
+end
+
+function generationIsFinish()
+  local rt = false
+  if genetic.genomeIndex > genetic.genomeMax then
+    table.insert(genetic.generations, genomesCopy(genetic.genomes))
+    genetic.geneIndex = 1
+    genetic.genomeIndex = 1
+    genetic.genome = {}
+    rt = true
+  end
+  return rt
+end
 
 --[[
 genetic = {

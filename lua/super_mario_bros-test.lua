@@ -126,9 +126,33 @@ function main()
 end
 
 function test()
+  newGenetic(10) -- 10 genomes max
   while true do
-    genome:process()
-    print(inspect(genome))
+    newGenome()
+    --process 10 genes
+    for i = 1, 10 do geneProcess(math.random(0, 4)) end
+    --process genome
+    genomeProcess()
+
+
+
+    --process 10 genes
+    for i = 1, 10 do geneProcess(math.random(0, 4)) end
+    --process genome
+    genomeProcess()
+
+
+    --process generation
+    generationProcess()
+    --[[
+    if not generationIsFinish() then
+      generationProcess()
+    else
+      print("GENERATION IS FINISH")
+    end
+    --]]
+
+    print(inspect(genetic))    
     emu.frameadvance()
   end
 end

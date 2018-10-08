@@ -101,9 +101,9 @@ end
 
 function mario.hud()
   gui.text(0, 0, "generation")
-  gui.text(50, 0, genetic.generationIndex)
+  --gui.text(50, 0, genetic.generationIndex)
   gui.text(0, 10, "genome")
-  gui.text(50, 10, genetic.genomeIndex)
+  --gui.text(50, 10, genetic.genomeIndex)
   gui.text(0, 40, "world")
   gui.text(0, 50, "level")
   gui.text(50, 40, mario.getWorld())
@@ -175,4 +175,26 @@ function main()
   end
 end
 
-main()
+
+function test()
+    init()
+    mario.start()
+    local genome = {}    
+    local control = 0
+    while true do
+      if (emu.framecount() % game.settings.joypad.rate) == 0 then
+        control = math.random(0, 4)
+        table.insert(genome, control)
+      end
+      joypadUpdate(control)
+      if mario.isDead() then
+        emu.softreset()
+        mario.start()
+      end
+      mario.hud()
+      emu.frameadvance()
+    end
+end
+
+--main()
+test()
