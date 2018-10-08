@@ -127,8 +127,8 @@ end
 
 function test()
   while true do
-    genetic:addGeneration()
-    print(inspect(genetic.genomes))
+    genome:process()
+    print(inspect(genome))
     emu.frameadvance()
   end
 end

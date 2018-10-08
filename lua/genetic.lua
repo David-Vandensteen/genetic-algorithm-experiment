@@ -10,14 +10,17 @@ require "lua-extend"
 
 genetic = {
   generationMax = 0,  --unlimited
-  generationIndex = 0,
   genomeMax = 10,
-  genomeIndex = 0,
-  geneIndex = 0,
 }
 
-function genetic.addGeneration(self)
+genome = {}
+
+function genome.process(self)
+
 end
+
+
+
 
 --[[
 genetic = {
