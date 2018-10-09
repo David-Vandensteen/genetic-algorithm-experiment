@@ -7,6 +7,7 @@
 
 --]]
 require "lua-extend"
+local inspect = require "inspect"
 
 genetic = {}
 
@@ -17,7 +18,8 @@ function newGenetic(_genomeMax)
   genetic.genome = {}
   genetic.genomes = {}
   genetic.generations = {}
-  genetic.generationIndex = 1 
+  genetic.generationIndex = 1
+  genetic.scores = {}
 end
 
 function newGenome()
@@ -42,25 +44,39 @@ function genomesCopy(_genomes)
   return rt
 end
 
-function genomeProcess()
+function genomeProcess(_score)
+  table.insert(genetic.scores, _score)
   genetic.genomes[genetic.genomeIndex] = genomeCopy(genetic.genome)
   genetic.genomeIndex = genetic.genomeIndex + 1
   genetic.geneIndex = 1
 end
 
 function generationProcess()
+  genetic.generations[genetic.generationIndex] = genomesCopy(genetic.genomes)
+  genetic.genomeIndex = 1
+  genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
+  genetic.scores = {} 
+end
+
+function genomesSort()
+  local scoresPreSort = table.copy(genetic.scores)
+  local bestId = {}
+  table.sort(genetic.scores, function (a, b) return a > b end)
+  for i = 1, table.getn(scoresPreSort) do
+    for j = 1, table.getn(genetic.scores) do
+      if scoresPreSort[i] == genetic.scores[j] then
+        table.insert(bestId, j)
+      end
+    end
+  end
+  print(inspect(bestId))
+  return genetic.scores
 end
 
 function generationIsFinish()
   local rt = false
-  if genetic.genomeIndex > genetic.genomeMax then
-    table.insert(genetic.generations, genomesCopy(genetic.genomes))
-    genetic.geneIndex = 1
-    genetic.genomeIndex = 1
-    genetic.genome = {}
-    rt = true
-  end
+  if genetic.genomeIndex > genetic.genomeMax then rt = true end
   return rt
 end
 

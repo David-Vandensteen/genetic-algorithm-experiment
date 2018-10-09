@@ -131,26 +131,15 @@ function test()
     newGenome()
     --process 10 genes
     for i = 1, 10 do geneProcess(math.random(0, 4)) end
+    
     --process genome
-    genomeProcess()
+    genomeProcess(math.random(100,1000))
 
-
-
-    --process 10 genes
-    for i = 1, 10 do geneProcess(math.random(0, 4)) end
-    --process genome
-    genomeProcess()
-
-
-    --process generation
-    generationProcess()
-    --[[
-    if not generationIsFinish() then
-      generationProcess()
-    else
-      print("GENERATION IS FINISH")
+    --process generation 2 genomes
+    if generationIsFinish() then
+      print(inspect(genomesSort()))
+      generationProcess() 
     end
-    --]]
 
     print(inspect(genetic))    
     emu.frameadvance()
