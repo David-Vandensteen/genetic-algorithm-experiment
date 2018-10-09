@@ -6,8 +6,9 @@
     Genetic lib for LUA
 
 --]]
+
 require "lua-extend"
-local inspect = require "inspect"
+--local inspect = require "inspect"
 
 genetic = {}
 
@@ -24,12 +25,20 @@ end
 
 function newGenome()
   genetic.genome = {}
+  if genetic.genomes[genetic.genomeIndex] then
+    genetic.genome = genomeCopy(genetic.genomes[genetic.genomeIndex])
+  end
 end
 
 function geneProcess(_gene)
-  table.insert(genetic.genome, _gene)
+  local rt = _gene
+  if not genetic.genome[genetic.geneIndex] then
+    table.insert(genetic.genome, _gene)
+  else
+    rt = genetic.genome[genetic.geneIndex]
+  end
   genetic.geneIndex = genetic.geneIndex + 1
-  return _gene
+  return rt
 end
 
 function genomeCopy(_genome)
@@ -56,21 +65,39 @@ function generationProcess()
   genetic.genomeIndex = 1
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
-  genetic.scores = {} 
+  genetic.scores = {}
+end
+
+function generationTrunc(_remove)
+  local generationPreTrunc = genomesCopy(genetic.genomes)
+  genetic.genomes = {}
+  for i = 1, table.getn(generationPreTrunc) - _remove do
+    table.insert(genetic.genomes, generationPreTrunc[i])
+  end
+  return genetic.genomes
+end
+
+function genomesTrunc(_remove)
+  for i = 1, table.getn(genetic.genomes) do
+    --table.trunc()
+  end
 end
 
 function genomesSort()
   local scoresPreSort = table.copy(genetic.scores)
+  local genomesPreSort = genomesCopy(genetic.genomes)
   local bestId = {}
   table.sort(genetic.scores, function (a, b) return a > b end)
-  for i = 1, table.getn(scoresPreSort) do
-    for j = 1, table.getn(genetic.scores) do
-      if scoresPreSort[i] == genetic.scores[j] then
+  for i = 1, table.getn(genetic.scores) do
+    for j = 1, table.getn(scoresPreSort) do
+      if genetic.scores[i] == scoresPreSort[j] then
         table.insert(bestId, j)
       end
     end
   end
-  print(inspect(bestId))
+  for i = 1, table.getn(genomesPreSort) do
+    genetic.genomes[i] = genomeCopy(genomesPreSort[bestId[i]])
+  end
   return genetic.scores
 end
 

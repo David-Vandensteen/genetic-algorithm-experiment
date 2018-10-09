@@ -101,9 +101,9 @@ end
 
 function mario.hud()
   gui.text(0, 0, "generation")
-  --gui.text(50, 0, genetic.generationIndex)
+  gui.text(50, 0, genetic.generationIndex)
   gui.text(0, 10, "genome")
-  --gui.text(50, 10, genetic.genomeIndex)
+  gui.text(50, 10, genetic.genomeIndex)
   gui.text(0, 40, "world")
   gui.text(0, 50, "level")
   gui.text(50, 40, mario.getWorld())
@@ -133,40 +133,29 @@ function updateLog()
 end
 
 function main()  
-  genetic.genomeMax = 10
-  genetic:addGenome()
-  genetic:processGene()
   logger.setFile("super_mario_bros.log")
   logger.clear()
   logger.info(os.date())
   logger.info("")
-  local control = 0
   init()
   mario.start()
+  newGenetic(10) --genome max
+  newGenome()
   while true do
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
-      control = genetic:processGene()
+      control = geneProcess(math.random(0, 4))
     end
     joypadUpdate(control)
     if mario.isDead() then
-      genetic:setScore(mario.getScore())
-      genetic:addGenome()
-      if genetic:generationIsFinish() then
-        updateLog()
-        genetic:clearGenomes()
-        -- copy the bests
-        for j = 1, table.getn(genetic.scores) do
-          for i = 1, 4 do
-            if genetic.scores[j].ranking == i then
-              genetic.genomes[i] = table.copy(genetic.scores[j].genome)
-              table.trunc(genetic.genomes[i], table.getn(genetic.genomes[i]) - 3)
-            end
-          end
-        end
-        genetic:addGeneration()
-        --control = genetic:processGene()
+      genomeProcess(mario.getScore())
+      if generationIsFinish() then
+        print(genetic.scores)
+        genomesSort()
+        generationTrunc(5) --keep bests genomes for next generation
+        generationProcess()
         wait(50)
       end
+      newGenome()
       emu.softreset()
       mario.start()
     end
@@ -175,26 +164,4 @@ function main()
   end
 end
 
-
-function test()
-    init()
-    mario.start()
-    local genome = {}    
-    local control = 0
-    while true do
-      if (emu.framecount() % game.settings.joypad.rate) == 0 then
-        control = math.random(0, 4)
-        table.insert(genome, control)
-      end
-      joypadUpdate(control)
-      if mario.isDead() then
-        emu.softreset()
-        mario.start()
-      end
-      mario.hud()
-      emu.frameadvance()
-    end
-end
-
---main()
-test()
+main()

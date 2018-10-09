@@ -7,15 +7,13 @@
 
 --]]
 
-function printTable(tableSrc) print(table.concat(tableSrc, ", ")) end
-
-function table.copy(tableSrc)
+function table.copy(_table)
   local rt = {}
-  for i = 1, table.getn(tableSrc) do rt[i] = tableSrc[i] end
+  for i = 1,table.getn(_table) do table.insert(rt, _table[i]) end
   return rt
 end
 
-function table.trunc(tableSrc, size)
-  for i = size + 1 , table.getn(tableSrc) do tableSrc[i] = nil end
-  return tableSrc
+function table.trunc(_table, _remove)
+  for i = 1, (table.getn(_table) - _remove) do _table[i] = nil end
+  return _table
 end
