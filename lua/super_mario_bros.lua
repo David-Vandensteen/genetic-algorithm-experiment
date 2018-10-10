@@ -150,8 +150,9 @@ function main()
       genomeProcess(mario.getScore())
       if generationIsFinish() then
         print(genetic.scores)
-        genomesSort()
-        generationTrunc(5) --keep bests genomes for next generation
+        genomesSort()         --  sort genomes by best score
+        generationTrunc(2)    --  keep bests genomes for next generation
+        genomesTrunc(5)       --  re-random the last genes
         generationProcess()
         wait(50)
       end
