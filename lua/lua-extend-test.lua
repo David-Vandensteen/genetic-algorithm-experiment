@@ -8,6 +8,8 @@
 --]]
 
 require "lua-extend"
+local inspect = require "inspect"
+print("")
 
 --
 local t = table.copy({0, 1, 2, 3})
@@ -17,9 +19,15 @@ else
   print("table.copy test failed")
 end
 --
+
+--
 local t = {0, 1, 2, 3, 4, 5, 6}
 table.trunc(t, 2)
-
+if t[5] == 4 and not t[6] and not t[7] then
+  print("table.trunc test passed")
+else
+  print("table.trunc test failed")
+end
 --
 
 --

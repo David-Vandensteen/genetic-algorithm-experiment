@@ -160,7 +160,7 @@ function test()
     newGenome()
 
     -- process genes
-    for i = 1, 4 do geneProcess(math.random(0, 4)) end
+    for i = 1, 10 do geneProcess(math.random(0, 4)) end
 
     -- process genome
     genomeProcess(math.random(100,1000)) --score
@@ -171,11 +171,12 @@ function test()
     -- process generation
     if generationIsFinish() then
       genomesSort()
-      generationTrunc(5) -- size keep the bests - remove lasts genomes
-      genomesTrunc(10) -- random the last genes (try another end solution)
-      generationProcess()  
+      generationTrunc(8) -- size keep the bests - remove lasts genomes
+      genomesTrunc(5) -- random the last genes (try another end solution)
+      print("genomes trunc")
+      print(inspect(genetic.genomes))
+      generationProcess()
     end
-
     emu.frameadvance()
   end
 end

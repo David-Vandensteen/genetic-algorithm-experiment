@@ -69,18 +69,17 @@ function generationProcess()
 end
 
 function generationTrunc(_remove)
-  local generationPreTrunc = genomesCopy(genetic.genomes)
-  genetic.genomes = {}
-  for i = 1, table.getn(generationPreTrunc) - _remove do
-    table.insert(genetic.genomes, generationPreTrunc[i])
+  for i = (table.getn(genetic.genomes) - _remove + 1), table.getn(genetic.genomes) do
+    genetic.genomes[i] = nil
   end
   return genetic.genomes
 end
 
 function genomesTrunc(_remove)
   for i = 1, table.getn(genetic.genomes) do
-    --table.trunc()
+    table.trunc(genetic.genomes[i], _remove)
   end
+  return genetic.genomes
 end
 
 function genomesSort()

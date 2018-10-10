@@ -14,6 +14,6 @@ function table.copy(_table)
 end
 
 function table.trunc(_table, _remove)
-  for i = 1, (table.getn(_table) - _remove) do _table[i] = nil end
+  for i = (table.getn(_table) - _remove + 1), table.getn(_table) do _table[i] = nil end
   return _table
 end
