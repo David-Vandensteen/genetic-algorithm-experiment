@@ -3,7 +3,7 @@
     David Vandensteen
     2018
 
-    Genetic test
+    Genetic Algorithm lib test
 
 --]]
 local inspect = require "inspect"

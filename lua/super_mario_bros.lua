@@ -3,28 +3,28 @@
     David Vandensteen
     2018
 
-    Mario Bros agent for Fceux LUA
-    Genetic algorithm is used for agent learning
-
+    Fceux LUA Mario Bros agent
+        Genetic algorithm is used for agent learning
 --]]
 
-local inspect = require "inspect"
-require "lua-extend"
-require "genetic"
-require "logger"
+local inspect = require "lib/inspect" -- deep table displaying
+require "lib/lua-extend"              -- table.copy, table.trunc ...
+require "lib/genetic"                 -- generation, genome, gene handling
+require "lib/logger"                  -- writing a log file
 
+-- settings
 game = {}
 game.settings = {}
 --Speed Supported are "normal","turbo","nothrottle","maximum"
 game.settings.speed = {}
 game.settings.speed.value = "turbo"
 game.settings.speed.set = {}
-function game.settings.speed.set.maximum() end
-function game.settings.speed.set.turbo() end
-function game.settings.speed.set.normal() end
 game.settings.joypad = {}
 game.settings.joypad.rate = 40
 
+function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
+function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
+function game.settings.speed.set.normal() game.settings.speed.value = "normal" end
 
 function wait(frameMax)
   local curF = emu.framecount()
@@ -92,14 +92,18 @@ end
 
 function mario.getScore() return mario.getPosition() + (mario.getLevel() * 10000) end
 
-function mario.fitness(pgenomes, scores, genomeMax, geneMax)
-  genomes.sortByScores(pgenomes, scores)
-  for i = 1, (table.getn(pgenomes) - 2) do
-    table.trunc(pgenomes[i], table.getn(pgenomes[i]) - 3)
-  end
+-- not used
+--[[
+function mario.getTimer()
+  return memory.readbyte(0x7f8) * 100 + memory.readbyte(0x7f9) * 10 + memory.readbyte(0x7fa)
 end
 
-function mario.hud()
+function mario.getMode()
+  return memory.readbyte(0xe)
+end
+--]]
+
+function mario.hudUpdate()
   gui.text(0, 0, "generation")
   gui.text(50, 0, genetic.generationIndex)
   gui.text(0, 10, "genome")
@@ -116,22 +120,6 @@ function mario.hud()
   gui.text(210, 40, mario.getPosition())
 end
 
-function updateLog()
-  emu.print("GENERATION : ", genetic.generationIndex)
-  emu.print(genetic.scores)
-  logger.info("-- GENERATION : ")
-  logger.info(genetic.generationIndex)
-  logger.info("--")
-  logger.info(inspect(genetic.genomes))
-  logger.info("")
-  genetic:sort() --TODO
-  logger.info("-- SCORES :")
-  logger.info(inspect(genetic.scores))
-  logger.info("")
-  logger.info("-------------------------------------------")
-  logger.info("")
-end
-
 function main()  
   logger.setFile("super_mario_bros.log")
   logger.clear()
@@ -139,28 +127,43 @@ function main()
   logger.info("")
   init()
   mario.start()
-  newGenetic(20) --genome max
+  newGenetic(10) --genome max
   newGenome()
+
+  -- learn
   while true do
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
       control = geneProcess(math.random(0, 4))
     end
     joypadUpdate(control)
     if mario.isDead() then
-      genomeProcess(mario.getScore())
+      -- append logfile
+      logger.info("world :")
+      logger.info(mario.getWorld())
+      logger.info("")
+      logger.info("level :")
+      logger.info(mario.getLevel())
+      genomeProcess(mario.getScore()) -- genome score
+      -- end current genome
       if generationIsFinish() then
+        -- append logfile
+        logger.info("generation: ")
+        logger.info(genetic.generationIndex)
+        logger.info("")
         print(genetic.scores)
-        genomesSort()         --  sort genomes by best score
-        --generationTrunc(2)    --  keep bests genomes for next generation
-        genomesTrunc(10)       --  re-random the last genes
+        genomesSort()                           --  sort genomes by best score
+        --generationTrunc(2)                    --  keep bests genomes for next generation
+        genomesTrunc(math.random(5, 30))        --  re-random the last genes
+        --
         generationProcess()
+        -- end current generation
         wait(50)
       end
       newGenome()
       emu.softreset()
       mario.start()
     end
-    mario.hud()
+    mario.hudUpdate()
     emu.frameadvance()
   end
 end
