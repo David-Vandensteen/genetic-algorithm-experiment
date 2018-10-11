@@ -139,7 +139,7 @@ function main()
   logger.info("")
   init()
   mario.start()
-  newGenetic(10) --genome max
+  newGenetic(20) --genome max
   newGenome()
   while true do
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
@@ -150,8 +150,9 @@ function main()
       genomeProcess(mario.getScore())
       if generationIsFinish() then
         print(genetic.scores)
-        genomesSort()
-        generationTrunc(5) --keep bests genomes for next generation
+        genomesSort()         --  sort genomes by best score
+        --generationTrunc(2)    --  keep bests genomes for next generation
+        genomesTrunc(10)       --  re-random the last genes
         generationProcess()
         wait(50)
       end
