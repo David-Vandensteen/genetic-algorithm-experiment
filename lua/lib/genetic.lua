@@ -8,7 +8,7 @@
 --]]
 
 require "lua-extend"
---local inspect = require "inspect"
+--local inspect = require "lib\\inspect"
 
 genetic = {}
 
@@ -66,6 +66,7 @@ function generationProcess()
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
   genetic.scores = {}
+  return genetic
 end
 
 function generationTrunc(_remove)

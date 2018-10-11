@@ -6,10 +6,10 @@
     Mario Bros agent "simulation" for testing without FCEUX
 --]]
 
-local inspect = require "inspect"
-require "lua-extend"
-require "genetic"
-require "logger"
+local inspect = require "lib/inspect"
+require "lib/lua-extend"
+require "lib/genetic"
+require "lib/logger"
 
 simul = {
   frame = 0
