@@ -120,7 +120,7 @@ function mario.hudUpdate()
   gui.text(210, 40, mario.getPosition())
 end
 
-function main()  
+function main()
   logger.setFile("super_mario_bros.log")
   logger.clear()
   logger.info(os.date())
@@ -137,23 +137,16 @@ function main()
     end
     joypadUpdate(control)
     if mario.isDead() then
-      -- append logfile
-      logger.info("world :")
-      logger.info(mario.getWorld())
-      logger.info("")
-      logger.info("level :")
-      logger.info(mario.getLevel())
       genomeProcess(mario.getScore()) -- genome score
       -- end current genome
       if generationIsFinish() then
         -- append logfile
-        logger.info("generation: ")
-        logger.info(genetic.generationIndex)
-        logger.info("")
         print(genetic.scores)
         genomesSort()                           --  sort genomes by best score
+        logger.info(inspect(genetic.genomes))   --  save genomes into the logfile
+        logger.info("")
         --generationTrunc(2)                    --  keep bests genomes for next generation
-        genomesTrunc(math.random(5, 30))        --  re-random the last genes
+        genomesTrunc(math.random(2, 10))        --  re-random the last genes
         --
         generationProcess()
         -- end current generation
