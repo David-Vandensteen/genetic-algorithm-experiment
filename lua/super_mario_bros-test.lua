@@ -106,22 +106,6 @@ function joypadUpdate(value)
   if value == 4 then joypad.write(1, {A = true, right = true, left = false, down = true}) end
 end
 
-function updateLog()
-  emu.print("GENERATION : ", genetic.generationIndex)
-  emu.print(genetic.scores)
-  logger.info("-- GENERATION : ")
-  logger.info(genetic.generationIndex)
-  logger.info("--")
-  logger.info(inspect(genetic.genomes))
-  logger.info("")
-  genetic:sort() --TODO
-  logger.info("-- SCORES :")
-  logger.info(inspect(genetic.scores))
-  logger.info("")
-  logger.info("-------------------------------------------")
-  logger.info("")
-end
-
 function main()  
   logger.setFile("super_mario_bros.log")
   logger.clear()
@@ -129,57 +113,56 @@ function main()
   logger.info("")
   init()
   mario.start()
-  newGenetic(10)
+  newGenetic(10) --genome max
   newGenome()
+
+  -- learn
   while true do
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
       control = geneProcess(math.random(0, 4))
     end
     joypadUpdate(control)
     if mario.isDead() then
-      genomeProcess(mario.getScore())
+      -- append logfile
+      logger.info("world :")
+      logger.info(mario.getWorld())
+      logger.info("")
+      logger.info("level :")
+      logger.info(mario.getLevel())
+      genomeProcess(mario.getScore()) -- genome score
+      -- end current genome
       if generationIsFinish() then
+        -- append logfile
+        logger.info("generation: ")
+        logger.info(genetic.generationIndex)
+        logger.info("")
         print(genetic.scores)
-        --genomesSort()
-        genomesTrunc(10)
+        genomesSort()                           --  sort genomes by best score
+        --generationTrunc(2)                    --  keep bests genomes for next generation
+        genomesTrunc(math.random(5, 30))        --  re-random the last genes
+        --
         generationProcess()
-        newGenome()
+        -- end current generation
         wait(50)
       end
+      newGenome()
       emu.softreset()
       mario.start()
     end
-    mario.hud()
+    mario.hudUpdate()
     emu.frameadvance()
   end
 end
 
-function test()
-  newGenetic(10) --  genomes max
-  while true do
-    newGenome()
-
-    -- process genes
-    for i = 1, 10 do geneProcess(math.random(0, 4)) end
-
-    -- process genome
-    genomeProcess(math.random(100,1000)) --score
-
-    -- print
-    print(inspect(genetic))    
-
-    -- process generation
-    if generationIsFinish() then
-      genomesSort()
-      generationTrunc(8) -- size keep the bests - remove lasts genomes
-      genomesTrunc(5) -- random the last genes (try another end solution)
-      print("genomes trunc")
-      print(inspect(genetic.genomes))
-      generationProcess()
-    end
-    emu.frameadvance()
-  end
+function test(_arg)
+  print("test")
+  if _arg then print(_arg) end
+  newGenetic(10)
+  newGenome()
+  for i = 1, 10 do geneProcess(math.random(0, 4)) end
+  genomeProcess(mario.getScore())
+  genomeSort()
 end
 
 --main()
-test()
+test(arg[1])
