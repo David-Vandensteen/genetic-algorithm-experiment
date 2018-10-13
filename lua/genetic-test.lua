@@ -6,9 +6,9 @@
     Genetic Algorithm lib test
 
 --]]
-local inspect = require "inspect"
-require "lua-extend"
-require "genetic"
+local inspect = require "lib/inspect"
+require "lib/lua-extend"
+require "lib/genetic"
 print("")
 
 --
@@ -21,7 +21,7 @@ end
 --
 
 --
-geneProcess(8)
+geneProcess({8})
 if genetic.geneIndex == 2 and genetic.generationIndex == 1 and genetic.genomeIndex == 1 and genetic.genome[1] == 8 then
   print("geneProcess() test passed")
 else
@@ -51,7 +51,7 @@ newGenetic(3)
 for i = 1, 3 do
   newGenome()
   for j = 1, 10 do
-    geneProcess(math.random(0, 4))
+    geneProcess({0, 1, 2, 3, 4})
   end
   genomeProcess(1380)
 end
@@ -75,7 +75,7 @@ newGenetic(3)
 for i = 1, 3 do
   newGenome()
   for j = 1, 3 do
-    geneProcess(2)
+    geneProcess({2})
   end
   genomeProcess(math.random(1000, 10000))
 end
@@ -85,4 +85,29 @@ if t[1] == 2 and t[2] == 2 and t[3] == 2 then
 else
   print("genomeCopy() test failed")
 end
+--
+
+--
+newGenetic(1)
+newGenome()
+for i = 1, 30 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
+--print(inspect(genetic.genome))
+genomeMutate(genetic.genome, 1)
+--print(inspect(genetic.genome))
+--
+
+--
+newGenetic(3)
+newGenome()
+for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
+genomeProcess()
+for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
+genomeProcess()
+for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
+genomeProcess()
+print(inspect(genetic.genomes))
+
+genomesMutate(0.5)
+print(inspect(genetic.genomes))
+
 --

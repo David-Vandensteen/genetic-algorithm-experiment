@@ -17,3 +17,8 @@ function table.trunc(_table, _remove)
   for i = (table.getn(_table) - _remove + 1), table.getn(_table) do _table[i] = nil end
   return _table
 end
+
+function fileExist(_name)
+  local f=io.open(_name,"r")
+  if f~=nil then io.close(f) return true else return false end
+end

@@ -30,10 +30,10 @@ function newGenome()
   end
 end
 
-function geneProcess(_gene)
-  local rt = _gene
+function geneProcess(_randomTable)
+  local rt = _randomTable[math.random(1, table.getn(_randomTable))]
   if not genetic.genome[genetic.geneIndex] then
-    table.insert(genetic.genome, _gene)
+    table.insert(genetic.genome, rt)
   else
     rt = genetic.genome[genetic.geneIndex]
   end
@@ -45,6 +45,22 @@ function genomeCopy(_genome)
   local rt = {}
   for i = 1, table.getn(_genome) do table.insert(rt, _genome[i]) end
   return rt
+end
+
+function genomeMutate(_genome, _pourcent)
+  local iterationMax = table.getn(_genome) * _pourcent
+  for i = 1, iterationMax do
+    local randomIndex = math.random(1, table.getn(_genome))
+    _genome[randomIndex] = math.random(0, 3)
+  end
+  return _genome
+end
+
+function genomesMutate(_pourcent)
+  for i = 1, table.getn(genetic.genomes) do
+    genomeMutate(genetic.genomes[i], _pourcent)
+  end
+  return genetic.genomes
 end
 
 function genomesCopy(_genomes)
@@ -61,7 +77,7 @@ function genomeProcess(_score)
 end
 
 function generationProcess()
-  genetic.generations[genetic.generationIndex] = genomesCopy(genetic.genomes)
+  --genetic.generations[genetic.generationIndex] = genomesCopy(genetic.genomes)
   genetic.genomeIndex = 1
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
@@ -107,23 +123,35 @@ function generationIsFinish()
   return rt
 end
 
-function geneticLoad()
+function geneticLoad(_file)
+  local rt = false
+  if fileExist(_file .. ".lua") then
+    print("load ".._file)
+    require (_file)
+    rt = true
+  else
+    print(_file.. " not found")
+    rt = false
+  end
+  return rt
 end
 
-function geneticSave()
-  local file = io.open("geneticSave.lua", "w+") --clear
+function geneticSave(_file)
+  local file = io.open(_file .. ".lua", "w+") --clear
   io.close(file)
-  local file = io.open("geneticSave.lua", "a")
+  local file = io.open(_file .. ".lua", "a")
   io.output(file)
-  io.write(inspect(genetic))
+  io.write("-- genetic dump instance\n")
+  io.write("-- " .. os.date() .. "\n")
+  io.write("genetic = "..inspect(genetic))
   io.write("\n")
   io.close(file)
 end
 
 function genomesSave(_file)
-  local file = io.open(_file, "w+") --clear
+  local file = io.open(_file .. ".lua", "w+") --clear
   io.close(file)
-  local file = io.open(_file, "a")
+  local file = io.open(_file .. ".lua", "a")
   io.output(file)
   io.write("genomesSaved = ".. inspect(genetic.genomes))
   io.write("\n")
@@ -131,7 +159,11 @@ function genomesSave(_file)
 end
 
 function genomesLoad(_file)
-  require "../genomesSaved"
-  print(inspect(genomesSaved))
-  genetic.genomes = genomesCopy(genomesSaved)
+  if fileExist(_file..".lua") then
+    print("load " .. _file)
+    require (_file)
+    genetic.genomes = genomesCopy(genomesSaved)
+  else
+    print(_file .. " file not found ...")
+  end
 end

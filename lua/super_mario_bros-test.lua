@@ -15,7 +15,6 @@ simul = {
   frame = 0
 }
 
-
 game = {}
 game.settings = {}
 --Speed Supported are "normal","turbo","nothrottle","maximum"
@@ -104,6 +103,7 @@ function joypadUpdate(value)
   if value == 2 then joypad.write(1, {A = false, right = false, left = false, down = true}) end
   if value == 3 then joypad.write(1, {A = true, right = true, left = false, down = false}) end
   if value == 4 then joypad.write(1, {A = true, right = true, left = false, down = true}) end
+  if value == 5 then joypad.write(1, {A = false, right = false, left = false, down = false}) end
 end
 
 function main()  

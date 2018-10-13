@@ -20,7 +20,19 @@ game.settings.speed = {}
 game.settings.speed.value = "turbo"
 game.settings.speed.set = {}
 game.settings.joypad = {}
+
+game.settings.joypad.right = 0
+game.settings.joypad.jump = 1
+game.settings.joypad.down = 2
+game.settings.joypad.jumpRight = 3
+game.settings.joypad.none = 4
+game.settings.joypad.rightDash = 5
+game.settings.joypad.jumpRightDash = 6
+
 game.settings.joypad.rate = 40
+game.settings.log = "super_mario_bros.log"
+game.settings.genFile = "super_mario_bros-genetic-save" --(implicit .lua ext)
+game.settings.genomeMax = 10
 
 function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
 function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
@@ -34,16 +46,25 @@ function wait(frameMax)
 end
 
 function joypadUpdate(value)
-  if value == 0 then joypad.write(1, {A = false, right = true, left = false, down = false}) end
-  if value == 1 then joypad.write(1, {A = true, right = false, left = false, down = false}) end
-  if value == 2 then joypad.write(1, {A = false, right = false, left = false, down = true}) end
-  if value == 3 then joypad.write(1, {A = true, right = true, left = false, down = false}) end
-  if value == 4 then joypad.write(1, {A = true, right = true, left = false, down = true}) end
+  if value == 0 then joypad.write(1, {B = false, A = false, right = true, left = false, down = false}) end --r
+  if value == 1 then joypad.write(1, {B = false, A = true, right = false, left = false, down = false}) end --a
+  if value == 2 then joypad.write(1, {B = false, A = false, right = false, left = false, down = true}) end --d
+  if value == 3 then joypad.write(1, {B = false, A = true, right = true, left = false, down = false}) end --ar
+  if value == 4 then joypad.write(1, {B = false, A = false, right = false, left = false, down = false}) end --non
+  if value == 5 then joypad.write(1, {B = true, A = false, right = true, left = false, down = false}) end --non
+  if value == 6 then joypad.write(1, {B = true, A = true, right = true, left = false, down = false}) end --non
 end
 
 function init()
   emu.softreset()
   emu.speedmode(game.settings.speed.value)
+end
+
+function initLog(_logFile)
+  logger.setFile(_logFile)
+  logger.clear()
+  logger.info(os.date())
+  logger.info("")
 end
 
 -- Mario Bros Functions
@@ -120,45 +141,58 @@ function mario.hudUpdate()
   gui.text(210, 40, mario.getPosition())
 end
 
+function mario.fitness()
+  genomesSort()                             --  sort genomes by best score
+  genetic.genomes[10] = genomeCopy(genetic.genomes[1])
+  genomeMutate(genetic.genomes[10], 0.02)
+  --generationTrunc(2)                        --  remove last genomes
+  genomesTrunc(math.random(10, 20))          --  remove last genes
+  --genomesMutate(0.01)                        --  mutate genes 0.1 -> 10%
+end
+
 function main()
-  logger.setFile("super_mario_bros.log")
-  logger.clear()
-  logger.info(os.date())
-  logger.info("")
+  initLog(game.settings.log)
   init()
   mario.start()
-  --geneticLoad() or newGenetic(10)
-  newGenetic(10) --genome max
-  genomesLoad("genomesSaved.lua")
+  if not geneticLoad(game.settings.genFile) then newGenetic(game.settings.genomeMax) end  -- load genetic instance from file(.lua) or start new Genetic
   newGenome()
 
   -- learn
   while true do
     if (emu.framecount() % game.settings.joypad.rate) == 0 then
-      control = geneProcess(math.random(0, 4))
+      weight = {  
+                  game.settings.joypad.right,
+                  game.settings.joypad.right,
+                  game.settings.joypad.jump,
+                  game.settings.joypad.down,
+                  game.settings.joypad.jumpRight,
+                  game.settings.joypad.none,
+                  game.settings.joypad.none,
+                  game.settings.joypad.rightDash,
+                  game.settings.joypad.jumpRightDash,
+                  game.settings.joypad.jumpRightDash
+                }
+      --local rnd = math.random(1, table.getn(weight))
+      --local value = weight[rnd]
+      --control = geneProcess(value)
+      control = geneProcess(weight)
     end
     joypadUpdate(control)
     if mario.isDead() then
       genomeProcess(mario.getScore()) -- genome score
       -- end current genome
       if generationIsFinish() then
-        -- append logfile
+        mario.fitness()
+        -- append logfile and print scores
         print(genetic.scores)
-        genomesSort()                           --  sort genomes by best score
-        
-        -- save current genomes into a file
-        genomesSave("genomesSaved.lua")
-        --
-
-        --generationTrunc(2)                    --  keep bests genomes for next generation
-        genomesTrunc(math.random(2, 10))        --  re-random the last genes
         --
         generationProcess()
-        geneticSave()                           -- dump current genetic to a file
+        geneticSave(game.settings.genFile)      -- dump current genetic to a file(.lua)
         -- end current generation
         wait(50)
       end
       newGenome()
+      control = 4
       emu.softreset()
       mario.start()
     end

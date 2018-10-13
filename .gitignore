@@ -3,5 +3,4 @@ package-lock.json
 .vscode
 .nyc_output
 lua/super_mario_bros.log
-lua/geneticSave.lua
-lua/genomesSaved.lua
+lua/super_mario_bros-genetic-save.lua
