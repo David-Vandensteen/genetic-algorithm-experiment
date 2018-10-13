@@ -127,7 +127,9 @@ function main()
   logger.info("")
   init()
   mario.start()
+  --geneticLoad() or newGenetic(10)
   newGenetic(10) --genome max
+  genomesLoad("genomesSaved.lua")
   newGenome()
 
   -- learn
@@ -143,12 +145,16 @@ function main()
         -- append logfile
         print(genetic.scores)
         genomesSort()                           --  sort genomes by best score
-        logger.info(inspect(genetic.genomes))   --  save genomes into the logfile
-        logger.info("")
+        
+        -- save current genomes into a file
+        genomesSave("genomesSaved.lua")
+        --
+
         --generationTrunc(2)                    --  keep bests genomes for next generation
         genomesTrunc(math.random(2, 10))        --  re-random the last genes
         --
         generationProcess()
+        geneticSave()                           -- dump current genetic to a file
         -- end current generation
         wait(50)
       end

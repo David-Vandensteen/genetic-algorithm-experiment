@@ -8,7 +8,7 @@
 --]]
 
 require "lib/lua-extend"
---local inspect = require "lib/inspect"
+local inspect = require "lib/inspect"
 
 genetic = {}
 
@@ -105,4 +105,33 @@ function generationIsFinish()
   local rt = false
   if genetic.genomeIndex > genetic.genomeMax then rt = true end
   return rt
+end
+
+function geneticLoad()
+end
+
+function geneticSave()
+  local file = io.open("geneticSave.lua", "w+") --clear
+  io.close(file)
+  local file = io.open("geneticSave.lua", "a")
+  io.output(file)
+  io.write(inspect(genetic))
+  io.write("\n")
+  io.close(file)
+end
+
+function genomesSave(_file)
+  local file = io.open(_file, "w+") --clear
+  io.close(file)
+  local file = io.open(_file, "a")
+  io.output(file)
+  io.write("genomesSaved = ".. inspect(genetic.genomes))
+  io.write("\n")
+  io.close(file)
+end
+
+function genomesLoad(_file)
+  require "../genomesSaved"
+  print(inspect(genomesSaved))
+  genetic.genomes = genomesCopy(genomesSaved)
 end
