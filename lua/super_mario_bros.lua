@@ -17,7 +17,7 @@ game = {}
 game.settings = {}
 --Speed Supported are "normal","turbo","nothrottle","maximum"
 game.settings.speed = {}
-game.settings.speed.value = "turbo"
+game.settings.speed.value = "maximum"
 game.settings.speed.set = {}
 game.settings.joypad = {}
 
@@ -28,6 +28,7 @@ game.settings.joypad.jumpRight = 3
 game.settings.joypad.none = 4
 game.settings.joypad.rightDash = 5
 game.settings.joypad.jumpRightDash = 6
+game.settings.joypad.left = 7
 
 game.settings.joypad.rate = 40
 game.settings.log = "super_mario_bros.log"
@@ -51,8 +52,9 @@ function joypadUpdate(value)
   if value == 2 then joypad.write(1, {B = false, A = false, right = false, left = false, down = true}) end --d
   if value == 3 then joypad.write(1, {B = false, A = true, right = true, left = false, down = false}) end --ar
   if value == 4 then joypad.write(1, {B = false, A = false, right = false, left = false, down = false}) end --non
-  if value == 5 then joypad.write(1, {B = true, A = false, right = true, left = false, down = false}) end --non
-  if value == 6 then joypad.write(1, {B = true, A = true, right = true, left = false, down = false}) end --non
+  if value == 5 then joypad.write(1, {B = true, A = false, right = true, left = false, down = false}) end
+  if value == 6 then joypad.write(1, {B = true, A = true, right = true, left = false, down = false}) end
+  if value == 7 then joypad.write(1, {B = false, A = false, right = false, left = true, down = false}) end
 end
 
 function init()
@@ -144,9 +146,14 @@ end
 function mario.fitness()
   genomesSort()                             --  sort genomes by best score
   genetic.genomes[10] = genomeCopy(genetic.genomes[1])
-  genomeMutate(genetic.genomes[10], 0.02)
+  genetic.genomes[9] = genomeCopy(genetic.genomes[2])
+  genetic.genomes[8] = genomeCopy(genetic.genomes[3])
+  --genomesMutate(0.02)
   --generationTrunc(2)                        --  remove last genomes
   genomesTrunc(math.random(10, 20))          --  remove last genes
+  genomeMutate(genetic.genomes[10], 0.01)
+  genomeMutate(genetic.genomes[9], 0.01)
+  genomeMutate(genetic.genomes[8], 0.01)
   --genomesMutate(0.01)                        --  mutate genes 0.1 -> 10%
 end
 
@@ -170,7 +177,8 @@ function main()
                   game.settings.joypad.none,
                   game.settings.joypad.rightDash,
                   game.settings.joypad.jumpRightDash,
-                  game.settings.joypad.jumpRightDash
+                  game.settings.joypad.jumpRightDash,
+                  game.settings.joypad.left
                 }
       --local rnd = math.random(1, table.getn(weight))
       --local value = weight[rnd]
