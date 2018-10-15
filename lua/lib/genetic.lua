@@ -16,18 +16,23 @@ function newGenetic(_genomeMax)
   genetic.genomeMax = _genomeMax
   genetic.geneIndex = 1
   genetic.genomeIndex = 1
+  genetic.genomeTime = 0
+  genetic.genomePosition = 0
   genetic.genome = {}
   genetic.genomes = {}
   genetic.generations = {}
   genetic.generationIndex = 1
   genetic.scores = {}
+  genetic.times = {}
+  genetic.genomePositions = {}
 end
 
-function newGenome()
+function newGenome(_startTime)
   genetic.genome = {}
   if genetic.genomes[genetic.genomeIndex] then
     genetic.genome = genomeCopy(genetic.genomes[genetic.genomeIndex])
   end
+  genetic.genomeTime = _startTime
 end
 
 function geneProcess(_randomTable)
@@ -69,19 +74,27 @@ function genomesCopy(_genomes)
   return rt
 end
 
+function genomeTimeEnd(_endTime)
+  genetic.genomeTime = _endTime - genetic.genomeTime
+end
+
 function genomeProcess(_score)
   table.insert(genetic.scores, _score)
+  table.insert(genetic.times, genetic.genomeTime)
   genetic.genomes[genetic.genomeIndex] = genomeCopy(genetic.genome)
   genetic.genomeIndex = genetic.genomeIndex + 1
   genetic.geneIndex = 1
 end
 
-function generationProcess()
+function generationProcess(_saveFile) -- optionnal save file
   --genetic.generations[genetic.generationIndex] = genomesCopy(genetic.genomes)
   genetic.genomeIndex = 1
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
+  genetic.genome = {}
+  if _saveFile then geneticSave(_saveFile) end
   genetic.scores = {}
+  genetic.times = {}
   return genetic
 end
 
@@ -99,7 +112,7 @@ function genomesTrunc(_remove)
   return genetic.genomes
 end
 
-function genomesSort()
+function genomesSort() -- todo sort times
   local scoresPreSort = table.copy(genetic.scores)
   local genomesPreSort = genomesCopy(genetic.genomes)
   local bestId = {}
@@ -123,14 +136,21 @@ function generationIsFinish()
   return rt
 end
 
-function geneticLoad(_file)
+function geneticLoad(_genomeMax , _file)
   local rt = false
   if fileExist(_file .. ".lua") then
     print("load ".._file)
     require (_file)
+    --cleaning
+    genetic.times = {}
+    genetic.scores = {}
+    genetic.geneIndex = 1
+    genetic.genomeIndex = 1
+    genetic.genome = {}
     rt = true
   else
-    print(_file.. " not found")
+    print(_file.. " not found, start newGenetic")
+    newGenetic(_genomeMax)
     rt = false
   end
   return rt
