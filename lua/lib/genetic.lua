@@ -19,7 +19,6 @@ function newGenetic(_genomeMax)
   genetic.genomeTime = 0
   genetic.genome = {}
   genetic.genomes = {}
-  genetic.generations = {}
   genetic.generationIndex = 1
   genetic.scores = {}
   genetic.times = {}
@@ -111,18 +110,18 @@ function genomesTrunc(_remove)
 end
 
 function genomesSort() -- todo sort times
-  local scoresPreSort = table.copy(genetic.scores)
-  local genomesPreSort = genomesCopy(genetic.genomes)
-  local bestId = {}
-  table.sort(genetic.scores, function (a, b) return a > b end)
-  for i = 1, table.getn(genetic.scores) do
+  local scoresPreSort = table.copy(genetic.scores)              -- save scores table before sort
+  local genomesPreSort = genomesCopy(genetic.genomes)           -- save genomes table before sort
+  local bestId = {}                                             -- prepare table for inject genome sorted ID
+  table.sort(genetic.scores, function (a, b) return a > b end)  -- sort scores
+  for i = 1, table.getn(genetic.scores) do                      -- itarate the sorted scores & compare with unsorted scores
     for j = 1, table.getn(scoresPreSort) do
       if genetic.scores[i] == scoresPreSort[j] then
-        table.insert(bestId, j)
+        table.insert(bestId, j)                                 -- insert in bestId if matching
       end
     end
   end
-  for i = 1, table.getn(genomesPreSort) do
+  for i = 1, table.getn(genomesPreSort) do                      -- reset genomes table by best score
     genetic.genomes[i] = genomeCopy(genomesPreSort[bestId[i]])
   end
   return genetic.scores

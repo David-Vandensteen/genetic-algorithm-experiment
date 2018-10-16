@@ -77,7 +77,7 @@ mario.score.world = 0
 mario.score.level = 0
 mario.score.worldCoef = 10000
 mario.score.levelCoef = 100000
-mario.score.timePenality = 0
+mario.score.timePenalty = 0
 
 function mario.start()
   wait(50)
