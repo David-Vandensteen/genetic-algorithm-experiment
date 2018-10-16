@@ -71,6 +71,14 @@ end
 
 -- Mario Bros Functions
 local mario = {}
+mario.score = {}
+mario.score.position = 0
+mario.score.world = 0
+mario.score.level = 0
+mario.score.worldCoef = 10000
+mario.score.levelCoef = 100000
+mario.score.timePenality = 0
+
 function mario.start()
   wait(50)
   joypad.write(1, {start = true})
@@ -113,7 +121,13 @@ function mario.getMaxScore(currentMax, scores)
   return rt
 end
 
-function mario.getScore() return mario.getPosition() + (mario.getLevel() * 10000) end
+function mario.getScore() 
+  return mario.getPosition()
+                                + 
+          ( (mario.getWorld() * mario.score.worldCoef) - mario.score.worldCoef)
+                                + 
+          ( (mario.getLevel() * mario.score.levelCoef) - mario.score.levelCoef)
+end
 
 -- not used
 --[[
@@ -194,7 +208,7 @@ function main()
       control = 4
       emu.softreset()
       mario.start()
-      newGenome(emu.framecount())
+      newGenome(emu.framecount()) -- must be call after softreset (timer)
     end
     mario.hudUpdate()
     emu.frameadvance()

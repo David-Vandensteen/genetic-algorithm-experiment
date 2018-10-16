@@ -17,14 +17,12 @@ function newGenetic(_genomeMax)
   genetic.geneIndex = 1
   genetic.genomeIndex = 1
   genetic.genomeTime = 0
-  genetic.genomePosition = 0
   genetic.genome = {}
   genetic.genomes = {}
   genetic.generations = {}
   genetic.generationIndex = 1
   genetic.scores = {}
   genetic.times = {}
-  genetic.genomePositions = {}
 end
 
 function newGenome(_startTime)
