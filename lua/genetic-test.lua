@@ -88,44 +88,112 @@ end
 --
 
 --
-newGenetic(1)
+newGenetic(3)
+
 newGenome()
-for i = 1, 30 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
---print(inspect(genetic.genome))
-genomeMutate(genetic.genome, 1)
---print(inspect(genetic.genome))
+geneProcess({0})
+genomeProcess()
+
+newGenome()
+geneProcess({1})
+genomeProcess()
+
+newGenome()
+geneProcess({2})
+genomeProcess()
+
+genomesMutate(1, {4, 3})
+if 
+  (genetic.genomes[1][1] == 3 or genetic.genomes[1][1] == 4)
+            and
+  (genetic.genomes[2][1] == 3 or genetic.genomes[2][1] == 4)
+            and
+  (genetic.genomes[3][1] == 3 or genetic.genomes[3][1] == 4)
+then
+  print("genomesMutate() test passed")
+else
+  print("genomesMutate() test failed")
+end
 --
 
 --
 newGenetic(3)
-newGenome()
-for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
-genomeProcess()
-for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
-genomeProcess()
-for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
-genomeProcess()
---print(inspect(genetic.genomes))
 
-genomesMutate(0.5)
---print(inspect(genetic.genomes))
---
-
---
-newGenetic(3)
-print(inspect(genetic))
 newGenome()
-for i = 1, 20 do geneProcess({0}) end
+geneProcess({0})
 genomeProcess(1500)
-newGenome()
 
-for i = 1, 20 do geneProcess({0}) end
+newGenome()
+geneProcess({1})
 genomeProcess(1501)
-newGenome()
 
-for i = 1, 20 do geneProcess({0}) end
-genomeProcess(1502)
 newGenome()
+geneProcess({2})
+genomeProcess(1502)
+
+if genetic.genomes[1][1] == 0 and genetic.genomes[2][1] == 1 and genetic.genomes[3][1] == 2 then
+  print("geneProcess() test passed")
+else
+  print("geneProcess() test failed")
+end
+--
+
+--
+newGenetic(3)
+
+newGenome(0)
+geneProcess({0})
+genomeTimeEnd(1000)
+genomeProcess(1500)
+
+newGenome(0)
+geneProcess({1})
+genomeTimeEnd(1001)
+genomeProcess(1501)
+
+newGenome(0)
+geneProcess({2})
+genomeTimeEnd(1002)
+genomeProcess(1502)
+
+if genetic.times[1] == 1000 and genetic.times[2] == 1001 and genetic.times[3] == 1002 then
+  print("genomeTimeEnd() test passed")
+else
+  print("genomeTimeEnd() test failed")
+end
+--
+
+--
+newGenetic(3)
+
+newGenome(0)
+geneProcess({0})
+genomeTimeEnd(1000)
+genomeProcess(1500)
+
+newGenome(0)
+geneProcess({1})
+genomeTimeEnd(1001)
+genomeProcess(1501)
+
+newGenome(0)
+geneProcess({2})
+genomeTimeEnd(1002)
+genomeProcess(1502)
 
 print(inspect(genetic))
+genomesSort()
+print(inspect(genetic))
+
+if  genetic.genomes[1][1] == 2 and genetic.genomes[2][1] == 1 and
+    genetic.genomes[3][1] == 0 and genetic.scores[1] == 1502 and
+    genetic.scores[2] == 1501 and genetic.scores[3] == 1500 and
+    genetic.times[1] == 1002 and
+    genetic.times[2] == 1001 and
+    genetic.times[3] == 1000
+then
+  print("genomesSort() test passed")
+else
+  print("genomesSort() test failed")
+end
 --

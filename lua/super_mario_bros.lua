@@ -34,6 +34,20 @@ game.settings.joypad.rate = 40
 game.settings.log = "super_mario_bros.log"
 game.settings.genFile = "super_mario_bros-genetic-save" --(implicit .lua ext)
 game.settings.genomeMax = 10
+game.settings.genesAvailable = {
+                                  game.settings.joypad.right,
+                                  game.settings.joypad.right,
+                                  game.settings.joypad.jump,
+                                  game.settings.joypad.down,
+                                  game.settings.joypad.jumpRight,
+                                  game.settings.joypad.none,
+                                  game.settings.joypad.none,
+                                  game.settings.joypad.rightDash,
+                                  game.settings.joypad.jumpRightDash,
+                                  game.settings.joypad.jumpRightDash,
+                                  game.settings.joypad.left
+                                }
+
 
 function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
 function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
@@ -164,10 +178,10 @@ function mario.fitness()
   genetic.genomes[8] = genomeCopy(genetic.genomes[3])
 
   genomesTrunc(math.random(10, 20))          --  remove last genes
-  genomeMutate(genetic.genomes[10], 0.1)
-  genomeMutate(genetic.genomes[9], 0.1)
-  genomeMutate(genetic.genomes[8], 0.1)
-  --genomesMutate(0.01)                        --  mutate genes 0.1 -> 10%
+  genomeMutate(genetic.genomes[10], 0.1, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[9], 0.1, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[8], 0.1, game.settings.genesAvailable)
+  --genomesMutate(0.01, game.settings.genesAvailable)  --  mutate genes 0.1 -> 10%
 end
 
 function main()
@@ -176,23 +190,10 @@ function main()
   mario.start()
   geneticLoad(game.settings.genomeMax, game.settings.genFile) -- load genetic instance from file(.lua) or start new Genetic with max genome
   newGenome(emu.framecount()) -- start time
-  local weightGenes = { --possible genes table
-    game.settings.joypad.right,
-    game.settings.joypad.right,
-    game.settings.joypad.jump,
-    game.settings.joypad.down,
-    game.settings.joypad.jumpRight,
-    game.settings.joypad.none,
-    game.settings.joypad.none,
-    game.settings.joypad.rightDash,
-    game.settings.joypad.jumpRightDash,
-    game.settings.joypad.jumpRightDash,
-    game.settings.joypad.left
-  }
 
   -- learn
   while true do
-    if (emu.framecount() % game.settings.joypad.rate) == 0 then control = geneProcess(weightGenes) end
+    if (emu.framecount() % game.settings.joypad.rate) == 0 then control = geneProcess(game.settings.genesAvailable) end
     joypadUpdate(control)
     if mario.isDead() then
       genomeTimeEnd(emu.framecount()) -- calculate the life time

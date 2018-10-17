@@ -49,18 +49,18 @@ function genomeCopy(_genome)
   return rt
 end
 
-function genomeMutate(_genome, _pourcent)
+function genomeMutate(_genome, _pourcent, _randomTable)
   local iterationMax = table.getn(_genome) * _pourcent
   for i = 1, iterationMax do
     local randomIndex = math.random(1, table.getn(_genome))
-    _genome[randomIndex] = math.random(0, 3)
+    _genome[randomIndex] = _randomTable[math.random(1, table.getn(_randomTable))]
   end
   return _genome
 end
 
-function genomesMutate(_pourcent)
+function genomesMutate(_pourcent, _randomTable)
   for i = 1, table.getn(genetic.genomes) do
-    genomeMutate(genetic.genomes[i], _pourcent)
+    genomeMutate(genetic.genomes[i], _pourcent, _randomTable)
   end
   return genetic.genomes
 end
@@ -112,6 +112,7 @@ end
 function genomesSort() -- todo sort times
   local scoresPreSort = table.copy(genetic.scores)              -- save table scores before sort
   local genomesPreSort = genomesCopy(genetic.genomes)           -- save table genomes before sort
+  local timesPreSort = table.copy(genetic.times)                -- save table times before sort
   local bestId = {}                                             -- prepare table for inject genome sorted ID
   table.sort(genetic.scores, function (a, b) return a > b end)  -- sort scores
   for i = 1, table.getn(genetic.scores) do                      -- iterate the sorted scores & compare with unsorted scores
@@ -121,9 +122,12 @@ function genomesSort() -- todo sort times
       end
     end
   end
+  genetic.times = {}
   for i = 1, table.getn(genomesPreSort) do                      -- reset genomes table by best scores
     genetic.genomes[i] = genomeCopy(genomesPreSort[bestId[i]])
-  end
+    --genetic.times = timesPreSort[bestId[id]]                 -- sort times table
+    table.insert(genetic.times, timesPreSort[bestId[id]])
+  end  
   return genetic.scores
 end
 
