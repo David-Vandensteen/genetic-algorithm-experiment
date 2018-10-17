@@ -13,7 +13,7 @@ print("")
 
 --
 newGenetic(10)
-if genetic.geneIndex == 1 and genetic.generationIndex == 1 and genetic.genomeIndex == 1 and genetic.genomeMax == 10 then
+if genetic.geneIndex == 1 and genetic.generationIndex == 1 and genetic.genomeIndex == 1 and genetic.genomeMax == 10 and genetic.genomeTime == 0 then
   print("newGenetic() test passed")
 else
   print("newGenetic() test failed")
@@ -105,9 +105,27 @@ for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
 genomeProcess()
 for i = 1, 20 do geneProcess({0, 1, 2, 3, 4, 5, 6, 7, 8, 9}) end
 genomeProcess()
-print(inspect(genetic.genomes))
+--print(inspect(genetic.genomes))
 
 genomesMutate(0.5)
-print(inspect(genetic.genomes))
+--print(inspect(genetic.genomes))
+--
 
+--
+newGenetic(3)
+print(inspect(genetic))
+newGenome()
+for i = 1, 20 do geneProcess({0}) end
+genomeProcess(1500)
+newGenome()
+
+for i = 1, 20 do geneProcess({0}) end
+genomeProcess(1501)
+newGenome()
+
+for i = 1, 20 do geneProcess({0}) end
+genomeProcess(1502)
+newGenome()
+
+print(inspect(genetic))
 --

@@ -48,6 +48,15 @@ emu = {}
 joypad ={}
 gui = {}
 
+mario.score = {}
+mario.score.position = 0
+mario.score.world = 0
+mario.score.level = 0
+mario.score.worldCoef = 10000
+mario.score.levelCoef = 100000
+mario.score.timePenalty = 0
+
+
 function emu.softreset()
   print("call emu.softreset()")
 end
@@ -86,8 +95,16 @@ end
 
 function mario.getWorld() return 1 end
 function mario.getLevel() return 1 end
-function mario.getScore() return 1 end
 function mario.getPosition() return 1 end
+
+function mario.getScore() 
+  return mario.getPosition()
+                                + 
+          ( (mario.getWorld() * mario.score.worldCoef) - mario.score.worldCoef)
+                                + 
+          ( (mario.getLevel() * mario.score.levelCoef) - mario.score.levelCoef)
+end
+
 
 function mario.hudUpdate()
   print("call mario.hudUpdate()")
@@ -156,48 +173,41 @@ function main()
   initLog(game.settings.log)
   init()
   mario.start()
-  if not geneticLoad(game.settings.genFile) then newGenetic(game.settings.genomeMax) end  -- load genetic instance from file(.lua) or start new Genetic
-  newGenome()
+  geneticLoad(game.settings.genomeMax, game.settings.genFile) -- load genetic instance from file(.lua) or start new Genetic with max genome
+  newGenome(emu.framecount()) -- start time
+  local weightGenes = { --possible genes table
+    game.settings.joypad.right,
+    game.settings.joypad.right,
+    game.settings.joypad.jump,
+    game.settings.joypad.down,
+    game.settings.joypad.jumpRight,
+    game.settings.joypad.none,
+    game.settings.joypad.none,
+    game.settings.joypad.rightDash,
+    game.settings.joypad.jumpRightDash,
+    game.settings.joypad.jumpRightDash,
+    game.settings.joypad.left
+  }
 
   -- learn
   while true do
-    if (emu.framecount() % game.settings.joypad.rate) == 0 then
-      weight = {  
-                  game.settings.joypad.right,
-                  game.settings.joypad.right,
-                  game.settings.joypad.jump,
-                  game.settings.joypad.down,
-                  game.settings.joypad.jumpRight,
-                  game.settings.joypad.none,
-                  game.settings.joypad.none,
-                  game.settings.joypad.rightDash,
-                  game.settings.joypad.jumpRightDash,
-                  game.settings.joypad.jumpRightDash,
-                  game.settings.joypad.left
-                }
-      --local rnd = math.random(1, table.getn(weight))
-      --local value = weight[rnd]
-      --control = geneProcess(value)
-      control = geneProcess(weight)
-    end
+    if (emu.framecount() % game.settings.joypad.rate) == 0 then control = geneProcess(weightGenes) end
     joypadUpdate(control)
     if mario.isDead() then
+      genomeTimeEnd(emu.framecount()) -- calculate the life time
       genomeProcess(mario.getScore()) -- genome score
       -- end current genome
       if generationIsFinish() then
         mario.fitness()
-        -- append logfile and print scores
         print(genetic.scores)
-        --
-        generationProcess()
-        geneticSave(game.settings.genFile)      -- dump current genetic to a file(.lua)
+        generationProcess(game.settings.genFile) -- optionnal save file
         -- end current generation
         wait(50)
       end
-      newGenome()
       control = 4
       emu.softreset()
       mario.start()
+      newGenome(emu.framecount()) -- must be call after softreset (timer)
     end
     mario.hudUpdate()
     emu.frameadvance()
