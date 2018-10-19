@@ -84,7 +84,6 @@ function genomeProcess(_score)
 end
 
 function generationProcess(_saveFile) -- optionnal save file
-  --genetic.generations[genetic.generationIndex] = genomesCopy(genetic.genomes)
   genetic.genomeIndex = 1
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1
@@ -110,23 +109,22 @@ function genomesTrunc(_remove)
 end
 
 function genomesSort() -- todo sort times
-  local scoresPreSort = table.copy(genetic.scores)              -- save table scores before sort
-  local genomesPreSort = genomesCopy(genetic.genomes)           -- save table genomes before sort
-  local timesPreSort = table.copy(genetic.times)                -- save table times before sort
+  local scoresPreSort = table.copy(genetic.scores)              -- save scores table before sort
+  local genomesPreSort = genomesCopy(genetic.genomes)           -- save genomes table before sort
+  local timesPreSort = table.copy(genetic.times)                -- save times table  before sort
   local bestId = {}                                             -- prepare table for inject genome sorted ID
+  genetic.times = {}                                            -- clear times table
   table.sort(genetic.scores, function (a, b) return a > b end)  -- sort scores
   for i = 1, table.getn(genetic.scores) do                      -- iterate the sorted scores & compare with unsorted scores
     for j = 1, table.getn(scoresPreSort) do
       if genetic.scores[i] == scoresPreSort[j] then
         table.insert(bestId, j)                                 -- insert in bestId if matching
+        table.insert(genetic.times, timesPreSort[j])            -- insert in times table
       end
     end
   end
-  genetic.times = {}
   for i = 1, table.getn(genomesPreSort) do                      -- reset genomes table by best scores
     genetic.genomes[i] = genomeCopy(genomesPreSort[bestId[i]])
-    --genetic.times = timesPreSort[bestId[id]]                 -- sort times table
-    table.insert(genetic.times, timesPreSort[bestId[id]])
   end  
   return genetic.scores
 end

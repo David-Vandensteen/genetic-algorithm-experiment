@@ -181,9 +181,7 @@ geneProcess({2})
 genomeTimeEnd(1002)
 genomeProcess(1502)
 
-print(inspect(genetic))
 genomesSort()
-print(inspect(genetic))
 
 if  genetic.genomes[1][1] == 2 and genetic.genomes[2][1] == 1 and
     genetic.genomes[3][1] == 0 and genetic.scores[1] == 1502 and

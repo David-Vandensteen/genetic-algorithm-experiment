@@ -22,3 +22,7 @@ function fileExist(_name)
   local f=io.open(_name,"r")
   if f~=nil then io.close(f) return true else return false end
 end
+
+function sleep(n)
+  if n > 0 then os.execute("ping -n " .. tonumber(n+1) .. " localhost > NUL") end
+end
