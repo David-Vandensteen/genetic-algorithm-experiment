@@ -91,7 +91,8 @@ mario.score.world = 0
 mario.score.level = 0
 mario.score.worldCoef = 10000
 mario.score.levelCoef = 100000
-mario.score.timePenalty = 0
+--mario.score.timePenalty = 0.0000021
+mario.score.timePenalty = 0.000000001
 
 function mario.start()
   wait(50)
@@ -135,12 +136,16 @@ function mario.getMaxScore(currentMax, scores)
   return rt
 end
 
-function mario.getScore() 
-  return mario.getPosition()
-                                + 
-          ( (mario.getWorld() * mario.score.worldCoef) - mario.score.worldCoef)
-                                + 
-          ( (mario.getLevel() * mario.score.levelCoef) - mario.score.levelCoef)
+function mario.getScore()
+  local rt = mario.getPosition()
+  local levelBonus = mario.getWorld() * mario.score.worldCoef
+  levelBonus = levelBonus + (mario.getLevel() * mario.score.levelCoef )
+  local timePenalty = genetic.genomeTime * ((mario.score.timePenalty * mario.score.levelCoef) * mario.score.worldCoef)
+  timePenalty = math.floor(timePenalty)
+  rt = rt + levelBonus
+  rt = rt - timePenalty
+  print("timrPenalty : " .. timePenalty .." score : " .. rt)
+  return rt
 end
 
 -- not used
@@ -166,7 +171,7 @@ function mario.hudUpdate()
   gui.text(150, 0, "max. score")
   --gui.text(210, 0, game.genetic.scores.max)
   gui.text(150, 10, "cur. score")
-  gui.text(210, 10, mario.getScore())
+  --gui.text(210, 10, mario.getScore())
   gui.text(150, 40, "cur. position")
   gui.text(210, 40, mario.getPosition())
 end
@@ -178,9 +183,9 @@ function mario.fitness()
   genetic.genomes[8] = genomeCopy(genetic.genomes[3])
 
   genomesTrunc(math.random(10, 20))          --  remove last genes
-  genomeMutate(genetic.genomes[10], 0.1, game.settings.genesAvailable)
-  genomeMutate(genetic.genomes[9], 0.1, game.settings.genesAvailable)
-  genomeMutate(genetic.genomes[8], 0.1, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[10], 0.01, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[9], 0.01, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[8], 0.01, game.settings.genesAvailable)
   --genomesMutate(0.01, game.settings.genesAvailable)  --  mutate genes 0.1 -> 10%
 end
 
