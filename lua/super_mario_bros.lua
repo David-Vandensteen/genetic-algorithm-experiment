@@ -144,7 +144,7 @@ function mario.getScore()
   timePenalty = math.floor(timePenalty)
   rt = rt + levelBonus
   rt = rt - timePenalty
-  print("timrPenalty : " .. timePenalty .." score : " .. rt)
+  print("timePenalty : " .. timePenalty .." score : " .. rt)
   return rt
 end
 
@@ -184,8 +184,8 @@ function mario.fitness()
 
   genomesTrunc(math.random(10, 20))          --  remove last genes
   genomeMutate(genetic.genomes[10], 0.01, game.settings.genesAvailable)
-  genomeMutate(genetic.genomes[9], 0.01, game.settings.genesAvailable)
-  genomeMutate(genetic.genomes[8], 0.01, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[9], 0.02, game.settings.genesAvailable)
+  genomeMutate(genetic.genomes[8], 0.03, game.settings.genesAvailable)
   --genomesMutate(0.01, game.settings.genesAvailable)  --  mutate genes 0.1 -> 10%
 end
 
