@@ -31,13 +31,19 @@ game.settings.joypad.b = 6
 game.settings.joypad.rate = 40
 --game.settings.log = "afterburner.log"
 game.settings.genFile = "afterburner-genetic-save" --(implicit .lua ext)
-game.settings.genomeMax = 10
+game.settings.genomeMax = 3
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
                                   game.settings.joypad.right,
+                                  game.settings.joypad.right,
+                                  game.settings.joypad.left,
                                   game.settings.joypad.left,
                                   game.settings.joypad.up,
                                   game.settings.joypad.down,
+                                  game.settings.joypad.a,
+                                  game.settings.joypad.a,
+                                  game.settings.joypad.a,
+                                  game.settings.joypad.a,
                                   game.settings.joypad.a,
                                   game.settings.joypad.b
                                 }
@@ -98,10 +104,17 @@ end
 
 function afterburner.fitness()
   genomesSort()                             --  sort genomes by best score
-  genetic.genomes[10] = genomeCopy(genetic.genomes[1]) -- clone the best
-  genetic.genomes[9] = genomeCopy(genetic.genomes[2])
-  genetic.genomes[8] = genomeCopy(genetic.genomes[3])
-
+  genetic.genomes[3] = genomeCopy(genetic.genomes[1]) -- clone the best
+  --[[
+  genetic.genomes[9] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[8] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[7] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[6] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[5] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[4] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[3] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[2] = genomeCopy(genetic.genomes[1])
+  --]]
   genomesTrunc(math.random(10, 20))          --  remove last genes
   --genomeMutate(genetic.genomes[10], 0.01, game.settings.genesAvailable)
   --genomeMutate(genetic.genomes[9], 0.02, game.settings.genesAvailable)
