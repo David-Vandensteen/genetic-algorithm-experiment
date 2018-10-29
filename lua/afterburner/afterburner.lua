@@ -10,7 +10,6 @@
 local inspect = require "lib/inspect" -- deep table displaying
 require "lib/lua-extend"              -- table.copy, table.trunc ...
 require "lib/genetic"                 -- generation, genome, gene handling
-require "lib/logger"                  -- writing a log file
 
 -- settings
 game = {}
@@ -30,7 +29,7 @@ game.settings.joypad.a = 5
 game.settings.joypad.b = 6
 
 game.settings.joypad.rate = 40
-game.settings.log = "afterburner.log"
+--game.settings.log = "afterburner.log"
 game.settings.genFile = "afterburner-genetic-save" --(implicit .lua ext)
 game.settings.genomeMax = 10
 game.settings.genesAvailable = {
@@ -70,11 +69,11 @@ function init()
   emu.speedmode(game.settings.speed.value)
 end
 
-function initLog(_logFile)
-  logger.setFile(_logFile)
-  logger.clear()
-  logger.info(os.date())
-  logger.info("")
+function hudUpdate()
+  gui.text(0, 10, "generation " .. genetic.generationIndex)
+  gui.text(0, 20, "genome    " .. genetic.genomeIndex)
+  --gui.text(100, 10, "time " .. emu.framecount() - genetic.genomeTime)
+  gui.text(100, 20, "score " .. emu.framecount() - genetic.genomeTime)
 end
 
 -- Afterburner Functions
@@ -99,7 +98,7 @@ end
 
 function afterburner.fitness()
   genomesSort()                             --  sort genomes by best score
-  genetic.genomes[10] = genomeCopy(genetic.genomes[1])
+  genetic.genomes[10] = genomeCopy(genetic.genomes[1]) -- clone the best
   genetic.genomes[9] = genomeCopy(genetic.genomes[2])
   genetic.genomes[8] = genomeCopy(genetic.genomes[3])
 
@@ -116,7 +115,6 @@ end
 function main()
   game.settings.speed.set.maximum()
   --game.settings.speed.set.normal()
-  initLog(game.settings.log)
   init()
   afterburner.start()
   geneticLoad(game.settings.genomeMax, game.settings.genFile) -- load genetic instance from file(.lua) or start new Genetic with max genome
@@ -142,7 +140,7 @@ function main()
       afterburner.start()
       newGenome(emu.framecount()) -- must be call after softreset (timer)
     end
-    --.hudUpdate()
+    hudUpdate()
     emu.frameadvance()
   end
 end
