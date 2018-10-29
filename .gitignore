@@ -2,5 +2,7 @@ node_modules/
 package-lock.json
 .vscode
 .nyc_output
-lua/super_mario_bros.log
-lua/super_mario_bros-genetic-save.lua
+lua/super_mario_bros/super_mario_bros.log
+lua/super_mario_bros/super_mario_bros-genetic-save.lua
+lua/afterburner/afterburner.log
+lua/afterburner/afterburner-genetic-save
