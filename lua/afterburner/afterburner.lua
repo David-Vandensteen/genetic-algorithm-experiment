@@ -104,6 +104,7 @@ end
 
 function afterburner.fitness()
   genomesSort()                             --  sort genomes by best score
+  genetic.genomes[2] = {}
   genetic.genomes[2] = genomeCopy(genetic.genomes[1]) -- clone the best
   table.trunc(genetic.genomes[2] ,math.random(1, 5)) -- remove last genes
   --table.trunc(genetic.genomes[3] ,math.random(1, 5))
