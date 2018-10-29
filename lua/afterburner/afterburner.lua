@@ -31,7 +31,7 @@ game.settings.joypad.b = 6
 game.settings.joypad.rate = 40
 --game.settings.log = "afterburner.log"
 game.settings.genFile = "afterburner-genetic-save" --(implicit .lua ext)
-game.settings.genomeMax = 3
+game.settings.genomeMax = 2
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
                                   game.settings.joypad.right,
@@ -104,9 +104,9 @@ end
 
 function afterburner.fitness()
   genomesSort()                             --  sort genomes by best score
-  genetic.genomes[3] = genomeCopy(genetic.genomes[1]) -- clone the best
+  genetic.genomes[2] = genomeCopy(genetic.genomes[1]) -- clone the best
   table.trunc(genetic.genomes[2] ,math.random(1, 5)) -- remove last genes
-  table.trunc(genetic.genomes[3] ,math.random(1, 5))
+  --table.trunc(genetic.genomes[3] ,math.random(1, 5))
 end
 
 
