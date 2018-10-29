@@ -105,21 +105,8 @@ end
 function afterburner.fitness()
   genomesSort()                             --  sort genomes by best score
   genetic.genomes[3] = genomeCopy(genetic.genomes[1]) -- clone the best
-  --[[
-  genetic.genomes[9] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[8] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[7] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[6] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[5] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[4] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[3] = genomeCopy(genetic.genomes[1])
-  genetic.genomes[2] = genomeCopy(genetic.genomes[1])
-  --]]
-  genomesTrunc(math.random(10, 20))          --  remove last genes
-  --genomeMutate(genetic.genomes[10], 0.01, game.settings.genesAvailable)
-  --genomeMutate(genetic.genomes[9], 0.02, game.settings.genesAvailable)
-  --genomeMutate(genetic.genomes[8], 0.03, game.settings.genesAvailable)
-  --genomesMutate(0.01, game.settings.genesAvailable)  --  mutate genes 0.1 -> 10%
+  table.trunc(genetic.genomes[2] ,math.random(1, 5)) -- remove last genes
+  table.trunc(genetic.genomes[3] ,math.random(1, 5))
 end
 
 
