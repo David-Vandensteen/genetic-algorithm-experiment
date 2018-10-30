@@ -27,6 +27,10 @@ game.settings.joypad.up = 3
 game.settings.joypad.down = 4
 game.settings.joypad.a = 5
 game.settings.joypad.b = 6
+game.settings.joypad.ul = 7
+game.settings.joypad.ur = 8
+game.settings.joypad.dl = 9
+game.settings.joypad.dr = 10
 
 game.settings.joypad.rate = 40
 --game.settings.log = "afterburner.log"
@@ -40,11 +44,10 @@ game.settings.genesAvailable = {
                                   game.settings.joypad.left,
                                   game.settings.joypad.up,
                                   game.settings.joypad.down,
-                                  game.settings.joypad.a,
-                                  game.settings.joypad.a,
-                                  game.settings.joypad.a,
-                                  game.settings.joypad.a,
-                                  game.settings.joypad.a,
+                                  game.settings.joypad.ul,
+                                  game.settings.joypad.ur,
+                                  game.settings.joypad.dl,
+                                  game.settings.joypad.dr,
                                   game.settings.joypad.b
                                 }
 
@@ -61,18 +64,28 @@ function wait(frameMax)
 end
 
 function joypadUpdate(value)
-  if value == 0 then joypad.write(1, {B = false, A = false, right = false, left = false, down = false, up = false}) end --none
-  if value == 1 then joypad.write(1, {B = false, A = false, right = true , left = false, down = false, up = false}) end --r
-  if value == 2 then joypad.write(1, {B = false, A = false, right = false, left = true , down = false, up = false}) end --l
-  if value == 3 then joypad.write(1, {B = false, A = false, right = false, left = false, down = false, up = true }) end --u
-  if value == 4 then joypad.write(1, {B = false, A = false, right = false, left = false, down = true , up = false}) end --d
-  if value == 5 then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --a
-  if value == 6 then joypad.write(1, {B = true , A = false, right = false, left = false, down = false, up = false}) end --b
+  if value == 0  then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --none
+  if value == 1  then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = false}) end --r
+  if value == 2  then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = false}) end --l
+  if value == 3  then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = true }) end --u
+  if value == 4  then joypad.write(1, {B = false, A = true , right = false, left = false, down = true , up = false}) end --d
+  if value == 5  then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --a
+  if value == 6  then joypad.write(1, {B = true , A = true , right = false, left = false, down = false, up = false}) end --b
+  if value == 7  then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = true }) end --ul
+  if value == 8  then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = true }) end --ur
+  if value == 9  then joypad.write(1, {B = false, A = true , right = false, left = true , down = true , up = false}) end --dl
+  if value == 10 then joypad.write(1, {B = false, A = true , right = true , left = false, down = true , up = false}) end --dr
+  
 end
 
-function init()
-  emu.softreset()
+function init(_speed)
+  if _speed == "normal" then
+    game.settings.speed.set.normal()
+  else
+    game.settings.speed.set.maximum()
+  end
   emu.speedmode(game.settings.speed.value)
+  emu.softreset()
 end
 
 function hudUpdate()
@@ -85,7 +98,7 @@ end
 -- Afterburner Functions
 local afterburner = {}
 
-function afterburner.start()
+function gameStart()
   wait(100)
   joypad.write(1, {start = true})
   emu.frameadvance()
@@ -120,12 +133,16 @@ end
 
 --
 
-function main()
-  game.settings.speed.set.maximum()
-  --game.settings.speed.set.normal()
-  init()
-  afterburner.start()
+function main(_speed)
+  if _speed == "normal" then
+    game.settings.speed.set.normal()
+  else
+    game.settings.speed.set.maximum()
+  end
   geneticLoad(game.settings.genomeMax, game.settings.genFile) -- load genetic instance from file(.lua) or start new Genetic with max genome
+  init()
+  local control = 0
+  gameStart()
   newGenome(emu.framecount()) -- start time
 
   -- learn
@@ -141,11 +158,10 @@ function main()
         print(genetic.scores)
         generationProcess(game.settings.genFile) -- optionnal save file
         -- end current generation
-        --wait(50)
       end
       control = 0
       emu.softreset()
-      afterburner.start()
+      gameStart()
       newGenome(emu.framecount()) -- must be call after softreset (timer)
     end
     hudUpdate()
@@ -153,4 +169,41 @@ function main()
   end
 end
 
-main()
+function main2(_speed)
+  local control = 0
+  geneticLoad(game.settings.genomeMax, game.settings.genFile) -- load genetic instance from file(.lua) or start new Genetic with max genome
+  while true do                         -- infinite loop
+
+    control = 0                         -- set control none
+    init(_speed)                        -- set speed & reset emul
+    gameStart()                         -- wait & press start macro
+    newGenome(emu.framecount())         -- start time
+
+    -- ALIVE
+    while not afterburner.isDead() do -- process & update
+      if (emu.framecount() % game.settings.joypad.rate) == 0 then 
+        control = geneProcess(game.settings.genesAvailable)
+      end
+      joypadUpdate(control)
+      hudUpdate()
+      emu.frameadvance()  
+    end
+    --
+
+    -- DEAD
+    genomeTimeEnd(emu.framecount())   -- calculate the life time
+    genomeProcess(genetic.genomeTime) -- genome score
+                                      -- end current genome
+    if generationIsFinish() then
+      afterburner.fitness()           -- fitness
+      print(genetic.scores)
+      generationProcess(game.settings.genFile)  -- optional save file
+                                                -- end current generation
+    end
+    --
+
+  end
+end
+
+--main(arg)
+main2(arg)
