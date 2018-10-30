@@ -18,6 +18,22 @@ function table.trunc(_table, _remove)
   return _table
 end
 
+function table.compare(_table1, _table2)
+  rt = true
+  if table.getn(_table1) == table.getn(_table2) then 
+    for i = 1, table.getn(_table1) do
+      if _table1[i] == _table2[i] and rt == true then
+        rt = true
+      else
+        rt = false
+    end
+  end
+  else
+    rt = false
+  end
+  return rt
+end
+
 function fileExist(_name)
   local f=io.open(_name,"r")
   if f~=nil then io.close(f) return true else return false end
