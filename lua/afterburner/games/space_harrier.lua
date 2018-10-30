@@ -22,7 +22,7 @@ game.settings.joypad.dl = 9
 game.settings.joypad.dr = 10
 
 game.settings.joypad.rate = 40
-game.settings.genFile = "afterburner-genetic-save" --(implicit .lua ext)
+game.settings.genFile = "space-harrier-genetic-save" --(implicit .lua ext)
 game.settings.genomeMax = 10
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
@@ -35,22 +35,37 @@ game.settings.genesAvailable = {
                                   game.settings.joypad.ul,
                                   game.settings.joypad.ur,
                                   game.settings.joypad.dl,
-                                  game.settings.joypad.dr,
-                                  game.settings.joypad.b
+                                  game.settings.joypad.dr
                                 }
 
+function gameStart()
+  wait(100)
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+  wait(100)
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+end
+                                                                
 function joypadUpdate(value)
-  if value == game.settings.joypad.none  then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --none
-  if value == game.settings.joypad.right then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = false}) end --r
-  if value == game.settings.joypad.left  then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = false}) end --l
-  if value == game.settings.joypad.up    then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = true }) end --u
-  if value == game.settings.joypad.down  then joypad.write(1, {B = false, A = true , right = false, left = false, down = true , up = false}) end --d
-  if value == game.settings.joypad.a     then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --a
-  if value == game.settings.joypad.b     then joypad.write(1, {B = true , A = true , right = false, left = false, down = false, up = false}) end --b
-  if value == game.settings.joypad.ul    then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = true }) end --ul
-  if value == game.settings.joypad.ur    then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = true }) end --ur
-  if value == game.settings.joypad.dl    then joypad.write(1, {B = false, A = true , right = false, left = true , down = true , up = false}) end --dl
-  if value == game.settings.joypad.dr    then joypad.write(1, {B = false, A = true , right = true , left = false, down = true , up = false}) end --dr  
+  local pad = {}
+  if value == game.settings.joypad.none  then pad = {B = false, A = false , right = false, left = false, down = false, up = false} end --none
+  if value == game.settings.joypad.right then pad = {B = false, A = false , right = true , left = false, down = false, up = false} end --r
+  if value == game.settings.joypad.left  then pad = {B = false, A = false , right = false, left = true , down = false, up = false} end --l
+  if value == game.settings.joypad.up    then pad = {B = false, A = false , right = false, left = false, down = false, up = true } end --u
+  if value == game.settings.joypad.down  then pad = {B = false, A = false , right = false, left = false, down = true , up = false} end --d
+  if value == game.settings.joypad.a     then pad = {B = false, A = true  , right = false, left = false, down = false, up = false} end --a
+  if value == game.settings.joypad.b     then pad = {B = true , A = false , right = false, left = false, down = false, up = false} end --b
+  if value == game.settings.joypad.ul    then pad = {B = false, A = false , right = false, left = true , down = false, up = true } end --ul
+  if value == game.settings.joypad.ur    then pad = {B = false, A = false , right = true , left = false, down = false, up = true } end --ur
+  if value == game.settings.joypad.dl    then pad = {B = false, A = false , right = false, left = true , down = true , up = false} end --dl
+  if value == game.settings.joypad.dr    then pad = {B = false, A = false , right = true , left = false, down = true , up = false} end --dr
+  if (emu.framecount() % 2 == 0) then pad.A = not pad.A end -- autofire
+  joypad.write(1, pad)
 end
 
 function hudUpdate()
@@ -61,7 +76,7 @@ end
 
 function isDead()
   local rt = false
-  while (memory.readbyte(0x0096) == 0xFF) and (memory.readbyte(0x00A8) == 0xFF) do
+  while (memory.readbyte(0x00B1) == 0x01) do
     rt = true
     emu.frameadvance()
   end

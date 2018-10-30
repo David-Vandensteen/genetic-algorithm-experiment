@@ -32,25 +32,19 @@ end
 
 function gameDetect()
   local rt = false
-  local headMario =       {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
-  local headAfterburner = {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x20, 0x40, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headMario =        {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headAfterburner =  {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x20, 0x40, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headSpaceHarrier = {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local head = {}
   for i = 1, 16 do
     table.insert(head ,rom.readbyte(i -1))
   end
   if table.compare(head, headMario) then rt = "Super Mario Bros" end
   if table.compare(head, headAfterburner) then rt = "Afterburner" end
+  if table.compare(head, headSpaceHarrier) then rt = "Space Harrier" end
   print(rt .. " detected")
   return rt
 end
-
---
-if gameDetect() == "Afterburner" then require "games/afterburner" end
---
-
-function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
-function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
-function game.settings.speed.set.normal() game.settings.speed.value = "normal" end
 
 function wait(frameMax)
   local curF = emu.framecount()
@@ -58,6 +52,16 @@ function wait(frameMax)
     emu.frameadvance()
   end
 end
+
+--
+if gameDetect() == "Afterburner" then require "games/afterburner" end -- overide with settings & functions from game
+if gameDetect() == "Space Harrier" then require "games/space_harrier" end
+--
+
+function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
+function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
+function game.settings.speed.set.normal() game.settings.speed.value = "normal" end
+
 
 function init(_speed)
   if _speed == "normal" then
