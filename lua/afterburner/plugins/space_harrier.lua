@@ -3,27 +3,13 @@
     David Vandensteen
     2018
 
-    Afterburner H.A.L settings and functions
+    Space Harrier H.A.L plugin
+      fitness on genome time life
 
 --]]
 
---Speed Supported are "normal","turbo","nothrottle","maximum"
-game.settings.speed.value = "maximum"
-game.settings.joypad.none = 0
-game.settings.joypad.right = 1
-game.settings.joypad.left = 2
-game.settings.joypad.up = 3
-game.settings.joypad.down = 4
-game.settings.joypad.a = 5
-game.settings.joypad.b = 6
-game.settings.joypad.ul = 7
-game.settings.joypad.ur = 8
-game.settings.joypad.dl = 9
-game.settings.joypad.dr = 10
-
-game.settings.joypad.rate = 40
+SavestateObj = savestate.object(1)
 game.settings.genFile = "space-harrier-genetic-save" --(implicit .lua ext)
-game.settings.genomeMax = 10
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
                                   game.settings.joypad.right,
@@ -68,12 +54,6 @@ function getJoypad(value)
   return pad
 end
 
-function hudUpdate()
-  gui.text(0, 10, "generation " .. genetic.generationIndex)
-  gui.text(0, 20, "genome    " .. genetic.genomeIndex)
-  gui.text(100, 20, "score " .. emu.framecount() - genetic.genomeTime)
-end
-
 function isDead()
   local rt = false
   while (memory.readbyte(0x00B1) == 0x01) do
@@ -81,6 +61,26 @@ function isDead()
     emu.frameadvance()
   end
   return rt
+end
+
+function update() -- optional
+  if game.frame == 1000 then
+    saveState()
+  end
+  if game.frame == 2000 then
+    loadState()
+  end
+end
+
+function saveState()
+  print("saveState")
+  savestate.save(SavestateObj)
+  savestate.persist(SavestateObj)
+end
+
+function loadState()
+  print("loadState")
+  savestate.load(SavestateObj)
 end
 
 function fitness()

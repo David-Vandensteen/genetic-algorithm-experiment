@@ -3,17 +3,17 @@
     David Vandensteen
     2018
 
-    H.A.L (Heuristic Agent Learning)
+    H.A.L (Heuristic Agent "Learning")
     Fceux LUA
         Supported games:
           - Afterburner
 --]]
 
 local inspect = require "lib/inspect" -- deep table displaying
-require "lib/lua-extend"              -- table.copy, table.trunc ...
+require "lib/lua-extend"              -- table.copy, table.trunc, sleep ...
 require "lib/genetic"                 -- generation, genome, gene handling
 
--- settings objects
+-- default settings
 game = {}
 game.settings = {}
 game.settings.speed = {}
@@ -22,6 +22,21 @@ game.settings.joypad = {}
 game.settings.joypad.rate = 40        -- default
 game.settings.genomeMax = 10          -- default
 game.frame = 0
+--Speed Supported are "normal","turbo","nothrottle","maximum"
+game.settings.speed.value = "maximum"
+game.settings.joypad.none = 0
+game.settings.joypad.right = 1
+game.settings.joypad.left = 2
+game.settings.joypad.up = 3
+game.settings.joypad.down = 4
+game.settings.joypad.a = 5
+game.settings.joypad.b = 6
+game.settings.joypad.ul = 7
+game.settings.joypad.ur = 8
+game.settings.joypad.dl = 9
+game.settings.joypad.dr = 10
+game.settings.joypad.rate = 40
+game.settings.genomeMax = 10
 
 function gameStart()                  -- default
   wait(100)
@@ -59,9 +74,18 @@ function nextFrame()
   emu.frameadvance()                  -- emulator next frame
 end
 
+function updateHud() -- default hud
+  gui.text(0, 10, "generation " .. genetic.generationIndex)
+  gui.text(0, 20, "genome    " .. genetic.genomeIndex)
+  gui.text(100, 20, "time " .. game.frame - genetic.genomeTime)
+end
+
+function update() end -- to be implemented in plugins if needed (optional)
+
+
 --
-if gameDetect() == "Afterburner" then require "games/afterburner" end -- overide with settings & functions from game
-if gameDetect() == "Space Harrier" then require "games/space_harrier" end
+if gameDetect() == "Afterburner" then require "plugins/afterburner" end -- overide with settings & functions from game
+if gameDetect() == "Space Harrier" then require "plugins/space_harrier" end
 --
 
 function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
@@ -97,8 +121,10 @@ function main(_speed)
         control = geneProcess(game.settings.genesAvailable)
       end
       joypad.write(1, getJoypad(control)) -- write joypad
-      hudUpdate()                         -- refresh hud
-      nextFrame()
+      update()                            -- if need to make something specific to a game
+                                              -- implement update function to the game plugin (optional)
+      updateHud()                         -- refresh hud
+      nextFrame()                         -- increment game cycle counter & advance the frame emulator
     end
     -----------------------------------------------------------------
 
@@ -107,13 +133,12 @@ function main(_speed)
     genomeProcess(genetic.genomeTime) -- genome score
                                       -- end current genome
     if generationIsFinish() then
-      fitness()                       -- fitness
+      fitness()                       -- fitness (to be implemented in plugin)
       print(genetic.scores)           -- display scores at console
       generationProcess(game.settings.genFile)  -- optional arg save file
                                                 -- end current generation
     end
     -----------------------------------------------------------------
-
   end
 end
 
