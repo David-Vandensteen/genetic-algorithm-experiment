@@ -21,6 +21,7 @@ game.settings.speed.set = {}
 game.settings.joypad = {}
 game.settings.joypad.rate = 40        -- default
 game.settings.genomeMax = 10          -- default
+game.frame = 0
 
 function gameStart()                  -- default
   wait(100)
@@ -53,6 +54,11 @@ function wait(frameMax)
   end
 end
 
+function nextFrame()
+  game.frame = game.frame + 1         -- inc. cycle counter
+  emu.frameadvance()                  -- emulator next frame
+end
+
 --
 if gameDetect() == "Afterburner" then require "games/afterburner" end -- overide with settings & functions from game
 if gameDetect() == "Space Harrier" then require "games/space_harrier" end
@@ -71,6 +77,7 @@ function init(_speed)
   end
   emu.speedmode(game.settings.speed.value)
   emu.softreset()
+  game.frame = 0
 end
 --
 
@@ -82,21 +89,21 @@ function main(_speed)
 
     init(_speed)                        -- set speed & reset emul
     gameStart()                         -- wait & press start macro (main game menu)
-    newGenome(emu.framecount())         -- set a new genome with start time
+    newGenome(game.frame)               -- set a new genome with start time
 
     -- ALIVE --------------------------------------------------------
     while not isDead() do -- process & update
-      if (emu.framecount() % game.settings.joypad.rate) == 0 then
+      if (game.frame % game.settings.joypad.rate) == 0 then
         control = geneProcess(game.settings.genesAvailable)
       end
-      joypadUpdate(control)              -- write joypad
-      hudUpdate()                        -- refresh hud
-      emu.frameadvance()                 -- nex frame
+      joypad.write(1, getJoypad(control)) -- write joypad
+      hudUpdate()                         -- refresh hud
+      nextFrame()
     end
     -----------------------------------------------------------------
 
     -- DEAD ---------------------------------------------------------
-    genomeTimeEnd(emu.framecount())   -- calculate the life time
+    genomeTimeEnd(game.frame)         -- calculate the life time
     genomeProcess(genetic.genomeTime) -- genome score
                                       -- end current genome
     if generationIsFinish() then

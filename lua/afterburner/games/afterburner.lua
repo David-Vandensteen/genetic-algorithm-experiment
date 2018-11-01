@@ -39,18 +39,18 @@ game.settings.genesAvailable = {
                                   game.settings.joypad.b
                                 }
 
-function joypadUpdate(value)
-  if value == game.settings.joypad.none  then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --none
-  if value == game.settings.joypad.right then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = false}) end --r
-  if value == game.settings.joypad.left  then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = false}) end --l
-  if value == game.settings.joypad.up    then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = true }) end --u
-  if value == game.settings.joypad.down  then joypad.write(1, {B = false, A = true , right = false, left = false, down = true , up = false}) end --d
-  if value == game.settings.joypad.a     then joypad.write(1, {B = false, A = true , right = false, left = false, down = false, up = false}) end --a
-  if value == game.settings.joypad.b     then joypad.write(1, {B = true , A = true , right = false, left = false, down = false, up = false}) end --b
-  if value == game.settings.joypad.ul    then joypad.write(1, {B = false, A = true , right = false, left = true , down = false, up = true }) end --ul
-  if value == game.settings.joypad.ur    then joypad.write(1, {B = false, A = true , right = true , left = false, down = false, up = true }) end --ur
-  if value == game.settings.joypad.dl    then joypad.write(1, {B = false, A = true , right = false, left = true , down = true , up = false}) end --dl
-  if value == game.settings.joypad.dr    then joypad.write(1, {B = false, A = true , right = true , left = false, down = true , up = false}) end --dr  
+function getJoypad(value)
+  if value == game.settings.joypad.none  then return {B = false, A = true , right = false, left = false, down = false, up = false} end --none
+  if value == game.settings.joypad.right then return {B = false, A = true , right = true , left = false, down = false, up = false} end --r
+  if value == game.settings.joypad.left  then return {B = false, A = true , right = false, left = true , down = false, up = false} end --l
+  if value == game.settings.joypad.up    then return {B = false, A = true , right = false, left = false, down = false, up = true } end --u
+  if value == game.settings.joypad.down  then return {B = false, A = true , right = false, left = false, down = true , up = false} end --d
+  if value == game.settings.joypad.a     then return {B = false, A = true , right = false, left = false, down = false, up = false} end --a
+  if value == game.settings.joypad.b     then return {B = true , A = true , right = false, left = false, down = false, up = false} end --b
+  if value == game.settings.joypad.ul    then return {B = false, A = true , right = false, left = true , down = false, up = true } end --ul
+  if value == game.settings.joypad.ur    then return {B = false, A = true , right = true , left = false, down = false, up = true } end --ur
+  if value == game.settings.joypad.dl    then return {B = false, A = true , right = false, left = true , down = true , up = false} end --dl
+  if value == game.settings.joypad.dr    then return {B = false, A = true , right = true , left = false, down = true , up = false} end --dr  
 end
 
 function hudUpdate()
