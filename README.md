@@ -12,7 +12,7 @@ He put pad control over the [FCEUX](http://www.fceux.com) Lua library.
 
 
 
-Training session:
+Training session video : [https://youtu.be/tQWdzBaPfcA](https://youtu.be/tQWdzBaPfcA)
 
 
 
