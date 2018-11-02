@@ -1,0 +1,73 @@
+--[[
+
+    David Vandensteen
+    2018
+
+    Space Harrier H.A.L plugin
+      fitness on genome time life
+
+--]]
+game.settings.genomeMax = 3
+game.settings.genFile = "gradius-genetic-save" --(implicit .lua ext)
+game.settings.genesAvailable = {
+                                  game.settings.joypad.none,
+                                  game.settings.joypad.right,
+                                  game.settings.joypad.left,
+                                  game.settings.joypad.left,
+                                  game.settings.joypad.up,
+                                  game.settings.joypad.up,
+                                  game.settings.joypad.down,
+                                  game.settings.joypad.down,
+                                  game.settings.joypad.ul,
+                                  game.settings.joypad.ur,
+                                  game.settings.joypad.dl,
+                                  game.settings.joypad.dr
+                                }
+
+function gameStart()
+  wait(200)
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+  joypad.write(1, {start = true})
+  emu.frameadvance()
+  wait(110)
+end
+                                                                                                
+function getJoypad(value)
+  local pad = {}
+  if value == game.settings.joypad.none  then pad = {B = false, A = true , right = false, left = false, down = false, up = false} end --none
+  if value == game.settings.joypad.right then pad = {B = false, A = true , right = true , left = false, down = false, up = false} end --r
+  if value == game.settings.joypad.left  then pad = {B = false, A = true , right = false, left = true , down = false, up = false} end --l
+  if value == game.settings.joypad.up    then pad = {B = false, A = true , right = false, left = false, down = false, up = true } end --u
+  if value == game.settings.joypad.down  then pad = {B = false, A = true , right = false, left = false, down = true , up = false} end --d
+  if value == game.settings.joypad.a     then pad = {B = false, A = true , right = false, left = false, down = false, up = false} end --a
+  if value == game.settings.joypad.b     then pad = {B = true , A = true , right = false, left = false, down = false, up = false} end --b
+  if value == game.settings.joypad.ul    then pad = {B = false, A = true , right = false, left = true , down = false, up = true } end --ul
+  if value == game.settings.joypad.ur    then pad = {B = false, A = true , right = true , left = false, down = false, up = true } end --ur
+  if value == game.settings.joypad.dl    then pad = {B = false, A = true , right = false, left = true , down = true , up = false} end --dl
+  if value == game.settings.joypad.dr    then pad = {B = false, A = true , right = true , left = false, down = true , up = false} end --dr
+  return pad
+end
+
+function isDead()
+  local rt = false
+  while (memory.readbyte(0x004c) ~= 0x00) do
+    rt = true
+    emu.frameadvance()
+  end
+  return rt
+end
+
+function update() -- optional
+end
+
+function fitness()
+  genomesSort()                                         -- sort genomes by best score
+
+  genetic.genomes[3] = genomeCopy(genetic.genomes[1])  -- clone the best
+  genetic.genomes[2] = genomeCopy(genetic.genomes[1])   -- clone the best
+
+  table.trunc(genetic.genomes[3] ,math.random(1, 15))  -- remove last genes
+  table.trunc(genetic.genomes[2] ,math.random(1, 5))    -- remove last genes
+end
+

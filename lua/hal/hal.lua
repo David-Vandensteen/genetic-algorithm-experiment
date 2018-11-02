@@ -7,6 +7,8 @@
     Fceux LUA
         Supported games:
           - Afterburner
+          - Space Harrier
+          - Gradius
 --]]
 
 local inspect = require "lib/inspect" -- deep table displaying
@@ -51,6 +53,7 @@ function gameDetect()
   local headMario =        {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headAfterburner =  {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x20, 0x40, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headSpaceHarrier = {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headGradius =      {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x04, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local head = {}
   for i = 1, 16 do
     table.insert(head ,rom.readbyte(i -1))
@@ -58,6 +61,7 @@ function gameDetect()
   if table.compare(head, headMario) then rt = "Super Mario Bros" end
   if table.compare(head, headAfterburner) then rt = "Afterburner" end
   if table.compare(head, headSpaceHarrier) then rt = "Space Harrier" end
+  if table.compare(head, headGradius) then rt = "Gradius" end
   print(rt .. " detected")
   return rt
 end
@@ -77,7 +81,7 @@ end
 function updateHud() -- default hud
   gui.text(0, 10, "generation " .. genetic.generationIndex)
   gui.text(0, 20, "genome    " .. genetic.genomeIndex)
-  gui.text(100, 20, "time " .. game.frame - genetic.genomeTime)
+  gui.text(200, 10, "time " .. game.frame - genetic.genomeTime)
 end
 
 function update() end -- to be implemented in plugins if needed (optional)
@@ -85,6 +89,7 @@ function update() end -- to be implemented in plugins if needed (optional)
 --
 if gameDetect() == "Afterburner" then require "plugins/afterburner" end -- overide with settings & functions from game
 if gameDetect() == "Space Harrier" then require "plugins/space_harrier" end
+if gameDetect() == "Gradius" then require "plugins/gradius" end
 --
 
 function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
