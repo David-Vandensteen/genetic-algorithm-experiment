@@ -1,11 +1,23 @@
 # genetic-algorithm-experiment
 
-Some draft code here for testing genetic algo.
+Some draft code here for "playing" with genetic algorithm and heuristic method.
 
-The **lua\super_mario_bros.lua** is an agent for FCEUX who play at Super Mario Bros. (currently he "learn" and finish the first level)  
+I'm writing **HAL** a multigame agent which try to finish some games on the **Nintendo NES** console ...  
+Currently, he learn: **Space Harrier**, **Afterburner**, **Gradius**
 
-For progress, the agent gets a minimum info about the game (only Mario position, level number, world number)  
+The agent try, retry and evolve some solutions.  
+He have a minimal information about the game (just a memory reading for the dead value)  
+He put pad control over the [FCEUX](http://www.fceux.com) Lua library.  
+(he does not "see" the game:  collision, enemies ...)
 
-Here a Youtube video :
 
 
+Training session:
+
+
+
+
+You need [FCEUX](http://www.fceux.com) and the games roms.  
+ - Launch [FCEUX](http://www.fceux.com) with the rom  
+ - Load hal.lua script
+ - You can pass the argument "**normal**" for a realtime speed emulator
