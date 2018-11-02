@@ -82,7 +82,6 @@ end
 
 function update() end -- to be implemented in plugins if needed (optional)
 
-
 --
 if gameDetect() == "Afterburner" then require "plugins/afterburner" end -- overide with settings & functions from game
 if gameDetect() == "Space Harrier" then require "plugins/space_harrier" end
@@ -99,9 +98,20 @@ function init(_speed)
   else
     game.settings.speed.set.maximum()
   end
+  emu.poweron()
   emu.speedmode(game.settings.speed.value)
-  emu.softreset()
   game.frame = 0
+end
+
+function saveState()
+  print("saveState")
+  savestate.save(savestate.object(1))
+  savestate.persist(savestate.object(1))
+end
+
+function loadState()
+  print("loadState")
+  savestate.load(savestate.object(1))
 end
 --
 
