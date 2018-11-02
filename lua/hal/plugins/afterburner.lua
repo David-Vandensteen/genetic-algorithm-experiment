@@ -6,7 +6,7 @@
     Afterburner H.A.L plugin
 
 --]]
-
+game.settings.genomeMax = 3
 game.settings.genFile = "afterburner-genetic-save" --(implicit .lua ext)
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
@@ -51,16 +51,10 @@ function update() end -- optional
 function fitness()
   genomesSort()                                         -- sort genomes by best score
 
-  genetic.genomes[10] = genomeCopy(genetic.genomes[1])  -- clone the best
-  genetic.genomes[9] = genomeCopy(genetic.genomes[2])   -- clone the best
-  genetic.genomes[8] = genomeCopy(genetic.genomes[3])   -- clone the best
+  genetic.genomes[3] = genomeCopy(genetic.genomes[1])  -- clone the best
+  genetic.genomes[2] = genomeCopy(genetic.genomes[1])   -- clone the best
 
-  table.trunc(genetic.genomes[10] ,math.random(1, 15))  -- remove last genes
-  table.trunc(genetic.genomes[9] ,math.random(1, 10))   -- remove last genes
-  table.trunc(genetic.genomes[8] ,math.random(1, 5))    -- remove last genes
-  table.trunc(genetic.genomes[7] ,math.random(1, 5))    -- remove last genes
-  table.trunc(genetic.genomes[6] ,math.random(1, 5))    -- remove last genes
-  table.trunc(genetic.genomes[5] ,math.random(1, 5))    -- remove last genes
-  table.trunc(genetic.genomes[4] ,math.random(1, 5))    -- remove last genes
+  table.trunc(genetic.genomes[3] ,math.random(1, 15))  -- remove last genes
+  table.trunc(genetic.genomes[2] ,math.random(1, 5))    -- remove last genes
 end
 
