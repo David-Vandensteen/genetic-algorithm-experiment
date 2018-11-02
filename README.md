@@ -19,5 +19,5 @@ Training session:
 
 You need [FCEUX](http://www.fceux.com) and the games roms.  
  - Launch [FCEUX](http://www.fceux.com) with the rom  
- - Load hal.lua script
+ - Load **hal.lua** script
  - You can pass the argument "**normal**" for a realtime speed emulator
