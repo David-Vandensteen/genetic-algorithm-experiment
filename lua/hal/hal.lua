@@ -9,6 +9,7 @@
           - Afterburner
           - Space Harrier
           - Gradius
+          - Road Fighter
 --]]
 
 local inspect = require "lib/inspect" -- deep table displaying
@@ -54,6 +55,7 @@ function gameDetect()
   local headAfterburner =  {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x20, 0x40, 0x40, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headSpaceHarrier = {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headGradius =      {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x04, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headRoadFighter =  {0x4E, 0x45, 0x53, 0x1A, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local head = {}
   for i = 1, 16 do
     table.insert(head ,rom.readbyte(i -1))
@@ -62,6 +64,7 @@ function gameDetect()
   if table.compare(head, headAfterburner) then rt = "Afterburner" end
   if table.compare(head, headSpaceHarrier) then rt = "Space Harrier" end
   if table.compare(head, headGradius) then rt = "Gradius" end
+  if table.compare(head, headRoadFighter) then rt = "Road Fighter" end
   print(rt .. " detected")
   return rt
 end
@@ -81,15 +84,17 @@ end
 function updateHud() -- default hud
   gui.text(0, 10, "generation " .. genetic.generationIndex)
   gui.text(0, 20, "genome    " .. genetic.genomeIndex)
-  gui.text(200, 10, "time " .. game.frame - genetic.genomeTime)
+  gui.text(170, 10, "time " .. game.frame - genetic.genomeTime)
 end
 
+function getScore() return genetic.genomeTime end -- default scoring
 function update() end -- to be implemented in plugins if needed (optional)
 
 --
 if gameDetect() == "Afterburner" then require "plugins/afterburner" end -- overide with settings & functions from game
 if gameDetect() == "Space Harrier" then require "plugins/space_harrier" end
 if gameDetect() == "Gradius" then require "plugins/gradius" end
+if gameDetect() == "Road Fighter" then require "plugins/road_fighter" end
 --
 
 function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
@@ -145,7 +150,7 @@ function main(_speed)
 
     -- DEAD ---------------------------------------------------------
     genomeTimeEnd(game.frame)         -- calculate the life time
-    genomeProcess(genetic.genomeTime) -- genome score
+    genomeProcess(getScore())         -- genome score
                                       -- end current genome
     if generationIsFinish() then
       fitness()                       -- fitness (to be implemented in plugin)
