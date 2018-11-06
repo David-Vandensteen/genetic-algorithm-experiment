@@ -83,7 +83,7 @@ function genomeProcess(_score)
   genetic.geneIndex = 1
 end
 
-function generationProcess(_saveFile) -- optionnal save file
+function generationProcess(_saveFile) -- optional save file
   genetic.genomeIndex = 1
   genetic.geneIndex = 1
   genetic.generationIndex = genetic.generationIndex + 1

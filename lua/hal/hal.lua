@@ -22,8 +22,9 @@ game.settings = {}
 game.settings.speed = {}
 game.settings.speed.set = {}
 game.settings.joypad = {}
-game.settings.joypad.rate = 40        -- default
-game.settings.genomeMax = 10          -- default
+game.settings.joypad.rate = 40            -- default
+game.settings.genomeMax = 10              -- default
+game.settings.geneticAutoBackup = 10000   -- backup each x game.frame
 game.frame = 0
 --Speed Supported are "normal","turbo","nothrottle","maximum"
 game.settings.speed.value = "maximum"
@@ -73,6 +74,14 @@ function wait(frameMax)
   local curF = emu.framecount()
   while emu.framecount() < curF + frameMax do
     emu.frameadvance()
+  end
+end
+
+function autoBackup()
+  if game.settings.geneticAutoBackup ~= 0 then            -- autobackup
+    if (game.frame % game.settings.geneticAutoBackup) == 0 then
+      geneticSave(game.settings.genFile .."-auto-" .. game.frame)
+    end
   end
 end
 
@@ -144,6 +153,7 @@ function main(_speed)
       update()                            -- if need to make something specific to a game
                                               -- implement update function to the game plugin (optional)
       updateHud()                         -- refresh hud
+      --autoBackup()                        -- auto backup if setting is <> 0
       nextFrame()                         -- increment game cycle counter & advance the frame emulator
     end
     -----------------------------------------------------------------

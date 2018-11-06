@@ -62,7 +62,23 @@ function isDead()
   return rt
 end
 
-function update() -- optional
+function update()
+  if game.frame - genetic.genomeTime == 160000 then
+    print("160000 save")
+    geneticSave("160000")
+  end
+  if game.frame - genetic.genomeTime == 170000 then
+    print("170000 save")
+    geneticSave("170000")
+  end
+  if game.frame - genetic.genomeTime == 180000 then
+    print("180000 save")
+    geneticSave("180000")
+  end
+  if game.frame - genetic.genomeTime == 190000 then
+    print("190000 save")
+    geneticSave("190000")
+  end
 end
 
 function fitness()
