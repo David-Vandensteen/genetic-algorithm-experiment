@@ -106,9 +106,20 @@ if gameDetect() == "Gradius" then require "plugins/gradius" end
 if gameDetect() == "Road Fighter" then require "plugins/road_fighter" end
 --
 
-function game.settings.speed.set.maximum() game.settings.speed.value = "maximum" end
-function game.settings.speed.set.turbo() game.settings.speed.value = "turbo" end 
-function game.settings.speed.set.normal() game.settings.speed.value = "normal" end
+function game.settings.speed.set.maximum() 
+  game.settings.speed.value = "maximum" 
+  emu.speedmode(game.settings.speed.value)
+end
+
+function game.settings.speed.set.turbo()
+  game.settings.speed.value = "turbo"
+  emu.speedmode(game.settings.speed.value)
+end 
+
+function game.settings.speed.set.normal()
+  game.settings.speed.value = "normal"
+  emu.speedmode(game.settings.speed.value)
+end
 
 
 function init(_speed)
@@ -118,7 +129,7 @@ function init(_speed)
     game.settings.speed.set.maximum()
   end
   emu.poweron()
-  emu.speedmode(game.settings.speed.value)
+  --emu.speedmode(game.settings.speed.value)
   game.frame = 0
 end
 

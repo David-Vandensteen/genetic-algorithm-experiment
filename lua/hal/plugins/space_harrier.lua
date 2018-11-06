@@ -50,6 +50,7 @@ function getJoypad(value)
   if value == game.settings.joypad.dl    then pad = {B = false, A = false , right = false, left = true , down = true , up = false} end --dl
   if value == game.settings.joypad.dr    then pad = {B = false, A = false , right = true , left = false, down = true , up = false} end --dr
   if (game.frame % 2) == 0 then pad.A = not pad.A end --autofire
+  if (game.frame > 192600) then pad = {B = false, A = false , right = false, left = false, down = false, up = false} end --none
   return pad
 end
 
@@ -58,11 +59,13 @@ function isDead()
   while (memory.readbyte(0x00B1) == 0x01) do
     rt = true
     emu.frameadvance()
+    while true do emu.frameadvance() end
   end
   return rt
 end
 
 function update()
+  --[[
   if game.frame - genetic.genomeTime == 160000 then
     print("160000 save")
     geneticSave("160000")
@@ -78,6 +81,15 @@ function update()
   if game.frame - genetic.genomeTime == 190000 then
     print("190000 save")
     geneticSave("190000")
+    game.settings.speed.set.normal()
+  end
+  if game.frame - genetic.genomeTime == 200000 then
+    print("200000 save")
+    geneticSave("200000")
+  end
+  --]]
+  if game.frame - genetic.genomeTime == 190000 then
+    game.settings.speed.set.normal()
   end
 end
 
