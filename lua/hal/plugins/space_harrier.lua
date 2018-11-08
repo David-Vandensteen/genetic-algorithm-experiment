@@ -50,7 +50,7 @@ function getJoypad(value)
   if value == game.settings.joypad.dl    then pad = {B = false, A = false , right = false, left = true , down = true , up = false} end --dl
   if value == game.settings.joypad.dr    then pad = {B = false, A = false , right = true , left = false, down = true , up = false} end --dr
   if (game.frame % 2) == 0 then pad.A = not pad.A end --autofire
-  if (game.frame > 192600) then pad = {B = false, A = false , right = false, left = false, down = false, up = false} end --none
+  if (game.frame > 192600) then pad = {B = false, A = false , right = false, left = false, down = false, up = false} end --none --CRAP
   return pad
 end
 
@@ -88,9 +88,6 @@ function update()
     geneticSave("200000")
   end
   --]]
-  if game.frame - genetic.genomeTime == 190000 then
-    game.settings.speed.set.normal()
-  end
 end
 
 function fitness()
