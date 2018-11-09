@@ -3,7 +3,7 @@
     David Vandensteen
     2018
 
-    H.A.L (Heuristic Agent "Learning")
+    H.A.L test
     Fceux LUA
         Supported games:
           - Afterburner
@@ -15,6 +15,8 @@
 local inspect = require "lib/inspect" -- deep table displaying
 require "lib/lua-extend"              -- table.copy, table.trunc, sleep ...
 require "lib/genetic"                 -- generation, genome, gene handling
+
+require "lib/fceux-simul"
 
 -- default settings
 game = {}
@@ -57,6 +59,7 @@ function gameDetect()
   local headSpaceHarrier = {0x4E, 0x45, 0x53, 0x1A, 0x08, 0x00, 0x10, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headGradius =      {0x4E, 0x45, 0x53, 0x1A, 0x02, 0x04, 0x31, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local headRoadFighter =  {0x4E, 0x45, 0x53, 0x1A, 0x01, 0x01, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
+  local headTest =         {0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00}
   local head = {}
   for i = 1, 16 do
     table.insert(head ,rom.readbyte(i -1))
@@ -66,6 +69,7 @@ function gameDetect()
   if table.compare(head, headSpaceHarrier) then rt = "Space Harrier" end
   if table.compare(head, headGradius) then rt = "Gradius" end
   if table.compare(head, headRoadFighter) then rt = "Road Fighter" end
+  if table.compare(head, headTest) then rt = "Test" end
   print(rt .. " detected")
   return rt
 end
@@ -104,6 +108,7 @@ if gameDetect() == "Afterburner" then require "plugins/afterburner" end -- overi
 if gameDetect() == "Space Harrier" then require "plugins/space_harrier" end
 if gameDetect() == "Gradius" then require "plugins/gradius" end
 if gameDetect() == "Road Fighter" then require "plugins/road_fighter" end
+if gameDetect() == "Test" then require "plugins/_test" end
 --
 
 function game.settings.speed.set.maximum() 
