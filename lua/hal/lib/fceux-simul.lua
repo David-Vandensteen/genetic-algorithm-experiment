@@ -14,9 +14,11 @@ rom = {}
 emu.frame = 0
 
 function emu.frameadvance() 
-  sleep(5) 
+  sleep(1)
   emu.frame = emu.frame + 1
+  print("frameAdvance...   " .. emu.frame)
 end
+
 function emu.speedmode() end
 function emu.poweron() end
 function emu.framecount() return emu.frame end

@@ -12,7 +12,7 @@
           - Road Fighter
 --]]
 
-local inspect = require "lib/inspect" -- deep table displaying
+inspect = require "lib/inspect" -- deep table displaying
 require "lib/lua-extend"              -- table.copy, table.trunc, sleep ...
 require "lib/genetic"                 -- generation, genome, gene handling
 
@@ -154,9 +154,8 @@ function main(_speed)
   geneticLoad(game.settings.genomeMax, game.settings.genFile) 
                                         -- load genetic instance from file(.lua) or start new Genetic with max genome
   while true do                         -- infinite loop
-
     init(_speed)                        -- set speed & reset emul
-    gameStartMacro()                         -- wait & press start macro (main game menu)
+    gameStartMacro()                    -- wait & press start macro (main game menu)
     newGenome(game.frame)               -- set a new genome with start time
 
     -- ALIVE --------------------------------------------------------
@@ -174,6 +173,7 @@ function main(_speed)
     -----------------------------------------------------------------
 
     -- DEAD ---------------------------------------------------------
+    print("dead...")
     genomeTimeEnd(game.frame)         -- calculate the life time
     genomeProcess(getScore())         -- genome score
                                       -- end current genome

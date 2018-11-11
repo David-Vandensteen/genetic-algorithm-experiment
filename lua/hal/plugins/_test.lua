@@ -12,10 +12,9 @@
 
 --@override--------------------------------
 --game.settings.genomeMax = 3 
---game.settings.joypad.rate = 30
+game.settings.joypad.rate = 1
 --game.settings.geneticAutoBackup = 5000       -- backup each x game.frame (0 is off)
 -------------------------------------------
-
 game.settings.genFile = "test-genetic-save" --(implicit .lua ext)
 game.settings.genesAvailable = {
                                   game.settings.joypad.none,
@@ -32,7 +31,7 @@ game.settings.genesAvailable = {
 --
 
 --@override----------------------------------------------------------
---function gameStartMacro() end
+function gameStartMacro() end
 --function getScore() end
 --[[
 function updateHud()
@@ -62,16 +61,18 @@ end
 
 function isDead()
   local rt = false
-  while (memory.readbyte(0x00B1) == 0x01) do
+  local rnd = math.random(1,20)
+  if rnd == 1 then
     rt = true
-    emu.frameadvance()
-    while true do emu.frameadvance() end
+    print("dead")
   end
   return rt
 end
 
 --@override
---function update() end
+function update()
+  print(inspect(genetic))
+end
 
 function fitness()
   --sort
@@ -86,4 +87,3 @@ function fitness()
   --mutate at 10%. arg3 is the random table
   --genomeMutate(genetic.genomes[3], 0.10, game.settings.genesAvailable)
 end
-
