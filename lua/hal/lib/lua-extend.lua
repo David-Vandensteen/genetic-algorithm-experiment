@@ -39,6 +39,9 @@ function fileExist(_name)
   if f~=nil then io.close(f) return true else return false end
 end
 
-function sleep(n)
-  if n > 0 then os.execute("ping -n " .. tonumber(n+1) .. " localhost > NUL") end
+function sleep(n) --todo test OS env
+  --if n > 0 then os.execute("ping -n " .. tonumber(n+1) .. " localhost > NUL") end --Windows
+  --if n > 0 then os.execute("ping -c " .. tonumber(n+1) .. " localhost > NUL") end --NIX
+  local ntime = os.time() + n
+  repeat until os.time() > ntime
 end

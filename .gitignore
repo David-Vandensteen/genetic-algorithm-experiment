@@ -11,3 +11,4 @@ lua/hal/170000.lua
 lua/hal/180000.lua
 lua/hal/190000.lua
 lua/hal/200000.lua
+lua/hal/test-genetic-save.lua
