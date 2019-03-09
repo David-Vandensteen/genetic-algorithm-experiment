@@ -1,13 +1,19 @@
 {
-  "name": "HAL",
+  "name": "hal",
   "version": "0.0.1",
   "description": "Multigame agent which try to finish some games on the Nintendo NES console via FCEUX Lua ...",
-  "main": "index.js",
+  "main": "hal-server.js",
   "author": "David Vandensteen",
   "license": "MIT",
+  "scripts": {
+    "start": "DEBUG=* node hal-server.js"
+  } ,
   "devDependencies": {
     "eslint": "^5.15.1",
     "eslint-config-airbnb-base": "^13.1.0",
     "eslint-plugin-import": "^2.16.0"
+  },
+  "dependencies": {
+    "debug": "^4.1.1"
   }
 }

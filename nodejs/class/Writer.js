@@ -1,4 +1,5 @@
 const fs = require('fs');
+const debug = require('debug')('Writer');
 
 class Writer {
   constructor(file) {
@@ -7,9 +8,24 @@ class Writer {
 
   push(content) {
     fs.appendFileSync(this.file, `${content}\n`, (err) => {
-      console.error(err);
+      debug(err);
     });
     return this;
+  }
+
+  lf() {
+    fs.appendFileSync(this.file, '\n', (err) => {
+      debug(err);
+    });
+    return this;
+  }
+
+  unlink() {
+    if (fs.existsSync(this.file)) {
+      fs.unlink(this.file, (err) => {
+        debug(err);
+      });
+    }
   }
 }
 
