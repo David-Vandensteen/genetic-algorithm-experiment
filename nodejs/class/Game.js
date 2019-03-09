@@ -46,16 +46,21 @@ class Game {
     this.writer.push('  while true do');
     this.writer.push('    gameStart()');
     this.writer.push('    while not isDead() do');
+    this.writer.push('      if (game.frame % 40) == 0 then');
+    this.writer.push('        game.sequence.id = game.sequence.id + 1');
+    this.writer.push('        control = game.sequence.genome[game.sequence.id]');
+    this.writer.push('      end');
     this.writer.push('      updateHud()');
     this.writer.push('      nextFrame()');
     this.writer.push('    end');
-    this.writer.push(`    saveResult("${this.config.fileResult})"`);
+    this.writer.push(`    saveResult("${this.config.fileResult}")`);
     this.writer.push('  end');
     this.writer.push('end');
     this.writer.lf();
     this.writer.push('main()');
     return this;
   }
+
 
   script() {
     debug('Generate script start');

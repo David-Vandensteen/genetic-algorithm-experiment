@@ -47,7 +47,10 @@ class FceuxScript {
 
   implementVar() {
     writer.push('game = {}');
+    writer.push('game.sequence = {}');
     writer.push('game.frame = 0');
+    writer.push('game.sequence.id = 0');
+    writer.push('game.sequence.genome = {0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4,0, 1, 2, 3, 4}');
     writer.lf();
     return this;
   }
