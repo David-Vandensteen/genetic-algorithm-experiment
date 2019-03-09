@@ -25,8 +25,7 @@ game.settings.genesAvailable = {
 
 function gameStart()
   wait(100)
-  joypad.write(1, {start = true})
-  emu.frameadvance()
+S  emu.frameadvance()
   joypad.write(1, {start = true})
   emu.frameadvance()
   wait(100)
@@ -35,7 +34,7 @@ function gameStart()
   joypad.write(1, {start = true})
   emu.frameadvance()
 end
-                                                                
+
 function getJoypad(value)
   local pad = {}
   if value == game.settings.joypad.none  then pad = {B = false, A = false , right = false, left = false, down = false, up = false} end --none
