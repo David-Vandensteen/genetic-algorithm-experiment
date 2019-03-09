@@ -1,6 +1,6 @@
 const config = {
   script: {
-    filePath: '/tmp/test.lua',
+    filePath: 'c:\\temp\\test.lua',
   },
 };
 

@@ -6,7 +6,8 @@
   "author": "David Vandensteen",
   "license": "MIT",
   "scripts": {
-    "start": "DEBUG=* node hal-server.js"
+    "start": "DEBUG=* node hal-server.js",
+    "start:win": "set DEBUG=* & node hal-server.js"
   } ,
   "devDependencies": {
     "eslint": "^5.15.1",

@@ -42,6 +42,7 @@ class FceuxScript {
     this.implementVar();
     this.implementNextFrame();
     this.implementWait();
+    this.implementSaveResult();
   }
 
   implementVar() {
@@ -70,6 +71,22 @@ class FceuxScript {
     writer.lf();
     return this;
   }
+
+  implementSaveResult() {
+    writer.lf();
+    writer.push('function saveResult(_file)');
+    writer.push('  local file = io.open(_file .. "w+")');
+    writer.push('  io.close(file)');
+    writer.push('  local file = io.open(_file .. "a")');
+    writer.push('  io.output(file)');
+    writer.push('  io.write("frameMax = ".. game.frame)');
+    writer.push('  io.write("\\n")');
+    writer.push('  io.close(file)');
+    writer.push('end');
+    writer.lf();
+    return this;
+  }
+
 
   wait(frameMax) {
     writer.push(`wait(${frameMax})`);
