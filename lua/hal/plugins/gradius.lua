@@ -3,7 +3,7 @@
     David Vandensteen
     2018
 
-    Space Harrier H.A.L plugin
+    Gradius H.A.L plugin
       fitness on genome time life
 
 --]]
@@ -32,7 +32,7 @@ function gameStart()
   emu.frameadvance()
   wait(110)
 end
-                                                                                                
+
 function getJoypad(value)
   local pad = {}
   if value == game.settings.joypad.none  then pad = {B = false, A = true , right = false, left = false, down = false, up = false} end --none
@@ -51,7 +51,8 @@ end
 
 function isDead()
   local rt = false
-  while (memory.readbyte(0x004c) ~= 0x00) do
+  while (memory.readbyte(0x0020) ~= 0x03) do
+    print("Dead")
     rt = true
     emu.frameadvance()
   end
@@ -70,4 +71,3 @@ function fitness()
   table.trunc(genetic.genomes[3] ,math.random(1, 15))  -- remove last genes
   table.trunc(genetic.genomes[2] ,math.random(1, 5))    -- remove last genes
 end
-

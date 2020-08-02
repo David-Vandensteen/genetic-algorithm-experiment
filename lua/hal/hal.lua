@@ -106,15 +106,15 @@ if gameDetect() == "Gradius" then require "plugins/gradius" end
 if gameDetect() == "Road Fighter" then require "plugins/road_fighter" end
 --
 
-function game.settings.speed.set.maximum() 
-  game.settings.speed.value = "maximum" 
+function game.settings.speed.set.maximum()
+  game.settings.speed.value = "maximum"
   emu.speedmode(game.settings.speed.value)
 end
 
 function game.settings.speed.set.turbo()
   game.settings.speed.value = "turbo"
   emu.speedmode(game.settings.speed.value)
-end 
+end
 
 function game.settings.speed.set.normal()
   game.settings.speed.value = "normal"
@@ -146,12 +146,13 @@ end
 
 function main(_speed)
   local control = 0                     -- set control none
-  geneticLoad(game.settings.genomeMax, game.settings.genFile) 
+  geneticLoad(game.settings.genomeMax, game.settings.genFile)
                                         -- load genetic instance from file(.lua) or start new Genetic with max genome
   while true do                         -- infinite loop
 
     init(_speed)                        -- set speed & reset emul
     gameStartMacro()                         -- wait & press start macro (main game menu)
+    gameStart()
     newGenome(game.frame)               -- set a new genome with start time
 
     -- ALIVE --------------------------------------------------------
