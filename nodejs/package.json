@@ -1,20 +1,32 @@
 {
   "name": "hal",
-  "version": "0.0.1",
-  "description": "Multigame agent which try to finish some games on the Nintendo NES console via FCEUX Lua ...",
+  "version": "1.0.0",
+  "description": "",
   "main": "hal-server.js",
-  "author": "David Vandensteen",
-  "license": "MIT",
   "scripts": {
-    "start": "DEBUG=* node hal-server.js",
-    "start:win": "set DEBUG=* & node hal-server.js"
-  } ,
-  "devDependencies": {
-    "eslint": "^5.15.1",
-    "eslint-config-airbnb-base": "^13.1.0",
-    "eslint-plugin-import": "^2.16.0"
+    "build:babel": "babel src --out-dir .dist",
+    "build:browserify": "browserify .dist/main.js -o dist/bundle.js",
+    "build:terser": "terser dist/bundle.js -o dist/bundle.min.js",
+    "build": "npm-run-all clean lint build:babel build:browserify build:terser",
+    "dev": "nodemon --watch src --exec eslint src",
+    "lint": "eslint src",
+    "clean": "rimraf .dist dist",
+    "serve": "npm run build && http-server"
   },
-  "dependencies": {
-    "debug": "^4.1.1"
+  "author": "David Vandensteen <dvandensteen@gmail.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "@babel/cli": "^7.13.14",
+    "@babel/core": "^7.13.15",
+    "@babel/node": "^7.13.13",
+    "@babel/preset-env": "^7.13.15",
+    "babel-eslint": "^10.1.0",
+    "browserify": "^17.0.0",
+    "eslint": "^7.24.0",
+    "eslint-config-airbnb-base": "^14.2.1",
+    "eslint-plugin-import": "^2.22.1",
+    "npm-run-all": "^4.1.5",
+    "rimraf": "^3.0.2",
+    "terser": "^5.6.1"
   }
 }

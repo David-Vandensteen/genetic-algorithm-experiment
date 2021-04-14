@@ -1,0 +1,1 @@
+[{ "operation": "wait", "params": ["100"] }, { "operation": "emu.poweron"}, { "operation": "emu.speedmode", "params": ["normal"] }, { "operation": "print", "params": ["OK"] }, { "operation": "joypad.write", "params": ["1", {"start": true}] }]
