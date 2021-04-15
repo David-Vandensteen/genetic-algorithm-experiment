@@ -438,6 +438,9 @@ local function handleOperations(operations)
     if operations[i].operation == "emu.speedmode" then
       emu.speedmode(operations[i].params[1])
     end
+    if operations[i].operation == "emu.frameadvance" then
+      emu.frameadvance()
+    end
   end
 end
 
@@ -447,9 +450,10 @@ local function main()
       print("load "..operationsFile)
       operations = json.decode(readFile(operationsFile))
       handleOperations(operations)
-      -- os.remove(fileExec..".lua")
+      os.remove(operationsFile)
     else
       print("Waiting operation...")
+      wait(100)
       -- file doesn t exist
       -- nothung to do
     end

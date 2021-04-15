@@ -5,13 +5,14 @@
   "main": "hal-server.js",
   "scripts": {
     "build:babel": "babel src --out-dir .dist",
-    "build:browserify": "browserify .dist/main.js -o dist/bundle.js",
-    "build:terser": "terser dist/bundle.js -o dist/bundle.min.js",
+    "build:browserify": "browserify --node .dist/hal-server.js -o dist/hal-server-bundle.js",
+    "build:terser": "terser dist/hal-server-bundle.js -o dist/hal-server-bundle.min.js",
     "build": "npm-run-all clean lint build:babel build:browserify build:terser",
     "dev": "nodemon --watch src --exec eslint src",
     "lint": "eslint src",
     "clean": "rimraf .dist dist",
-    "serve": "npm run build && http-server"
+    "serve": "npm run build",
+    "start": "node dist/hal-server-bundle.min.js"
   },
   "author": "David Vandensteen <dvandensteen@gmail.com>",
   "license": "MIT",
