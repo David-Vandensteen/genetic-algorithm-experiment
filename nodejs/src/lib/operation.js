@@ -1,7 +1,18 @@
 import fs from 'fs';
+import pathExists from 'path-exists';
+import pWaitFor from 'p-wait-for';
 
 const fsP = fs.promises;
 const { log } = console;
+
+fsP.notExists = (path) => new Promise(
+  (resolve, reject) => ((fs.existsSync(path)) ? reject(new Error(`${path} exist`)) : resolve()),
+);
+
+function pathNotExists(path) {
+  return pathExists(path)
+    .then((exist) => !exist);
+}
 
 export default class Operation {
   constructor(file, fileHistory) {
@@ -86,6 +97,11 @@ export default class Operation {
 
   commit() {
     return fsP.writeFile(this.file, JSON.stringify(this.operationsQ))
-      .then(() => { this.operationsQ = []; });
+      .then(() => {
+        this.operationsQ = [];
+        return pWaitFor(() => pathNotExists(this.file))
+          .then(() => { Promise.resolve(); })
+          .catch(() => { Promise.reject(); });
+      });
   }
 }

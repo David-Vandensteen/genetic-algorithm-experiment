@@ -453,11 +453,11 @@ local function main()
       os.remove(operationsFile)
     else
       print("Waiting operation...")
-      wait(100)
+      --wait(100)
       -- file doesn t exist
       -- nothung to do
     end
-    emu.frameadvance()
+    --emu.frameadvance()
   end
 end
 
