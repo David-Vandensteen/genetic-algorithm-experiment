@@ -394,6 +394,8 @@ end
 operationsFile = "operations.json"
 --[{ "operation": "wait", "params": ["100"] }, { "operation": "emu.poweron"}, { "operation": "emu.speedmode", "params": ["normal"] }, { "operation": "print", "params": ["OK"] }, { "operation": "joypad.write", "params": ["1", {"start": true}] }]
 
+loopCycle = 0
+
 local function fileExist(_name)
   local f=io.open(_name,"r")
   if f~=nil then io.close(f) return true else return false end
@@ -421,6 +423,11 @@ local function wait(frameMax)
   end
 end
 
+
+function os.timeout(n) --todo
+  os.execute("cmd /c timeout "..n)
+end
+
 local function handleOperations(operations)
   for i = 1, table.getn(operations) do
     if operations[i].operation == "wait" then
@@ -444,20 +451,44 @@ local function handleOperations(operations)
   end
 end
 
+function os.capture(cmd, raw)
+  local handle = assert(io.popen(cmd, 'r'))
+  local output = assert(handle:read('*a'))
+  handle:close()
+  if raw then
+      return output
+  end
+  output = string.gsub(
+      string.gsub(
+          string.gsub(output, '^%s+', ''),
+          '%s+$',
+          ''
+      ),
+      '[\n\r]+',
+      ' '
+  )
+ return output
+end
+
 local function main()
+  local operationsRaw = os.capture("node C:\\Users\\davidv\\Documents\\github\\genetic-algorithm-experiment\\nodejs\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
+  print(operationsRaw)
+
+  if operationsRaw then
+    operations = json.decode(operationsRaw)
+  end
+
   while true do
-    if fileExist(operationsFile) then
-      print("load "..operationsFile)
-      operations = json.decode(readFile(operationsFile))
+    if operations then
       handleOperations(operations)
-      os.remove(operationsFile)
     else
       print("Waiting operation...")
-      --wait(100)
+      os.timeout(5)
       -- file doesn t exist
       -- nothung to do
     end
     --emu.frameadvance()
+    loopCycle = loopCycle + 1
   end
 end
 

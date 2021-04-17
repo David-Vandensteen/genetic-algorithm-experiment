@@ -27,11 +27,12 @@ export default class Operation {
   }
 
   startMacro() {
-    return this.wait(100)
+    return this.wait(200)
       .joypadWrite('1', { start: true })
       .emuFrameAdvance()
       .joypadWrite('1', { start: true })
-      .emuFrameAdvance();
+      .emuFrameAdvance()
+      .wait(110);
   }
 
   print(data) {

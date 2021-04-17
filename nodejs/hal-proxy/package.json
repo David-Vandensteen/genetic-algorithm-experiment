@@ -2,17 +2,17 @@
   "name": "hal",
   "version": "1.0.0",
   "description": "",
-  "main": "hal-server.js",
+  "main": "hal-proxy.js",
   "scripts": {
     "build:babel": "babel src --out-dir .dist",
-    "build:browserify": "browserify --node .dist/hal-server.js -o dist/hal-server-bundle.js",
-    "build:terser": "terser dist/hal-server-bundle.js -o dist/hal-server-bundle.min.js",
+    "build:browserify": "browserify --node .dist/hal-proxy.js -o dist/hal-proxy-bundle.js",
+    "build:terser": "terser dist/hal-proxy-bundle.js -o dist/hal-proxy-bundle.min.js",
     "build": "npm-run-all clean lint build:babel build:browserify build:terser",
     "dev": "nodemon --watch src --exec eslint src",
     "lint": "eslint src",
     "clean": "rimraf .dist dist",
     "serve": "npm run build",
-    "start": "node dist/hal-server-bundle.min.js"
+    "start": "node dist/hal-proxy-bundle.min.js"
   },
   "author": "David Vandensteen <dvandensteen@gmail.com>",
   "license": "MIT",
@@ -30,9 +30,5 @@
     "rimraf": "^3.0.2",
     "terser": "^5.6.1"
   },
-  "dependencies": {
-    "p-limit": "^3.1.0",
-    "p-wait-for": "^3.2.0",
-    "path-exists": "^4.0.0"
-  }
+  "dependencies": {}
 }
