@@ -1,38 +1,13 @@
-import fs from 'fs';
-import pathExists from 'path-exists';
-import pWaitFor from 'p-wait-for';
-
-const fsP = fs.promises;
 const { log } = console;
 
-fsP.notExists = (path) => new Promise(
-  (resolve, reject) => ((fs.existsSync(path)) ? reject(new Error(`${path} exist`)) : resolve()),
-);
-
-function pathNotExists(path) {
-  return pathExists(path)
-    .then((exist) => !exist);
-}
-
 export default class Operation {
-  constructor(file, fileHistory) {
-    this.file = file;
-    this.fileHistory = fileHistory;
+  constructor() {
     this.operationsQ = [];
   }
 
-  initMacro(speed) {
-    return this.emuSpeedMode(speed)
-      .emuPowerOn();
-  }
-
-  startMacro() {
-    return this.wait(200)
-      .joypadWrite('1', { start: true })
-      .emuFrameAdvance()
-      .joypadWrite('1', { start: true })
-      .emuFrameAdvance()
-      .wait(110);
+  add(opArray) {
+    this.operationsQ = this.operationsQ.concat(opArray);
+    return this;
   }
 
   print(data) {
@@ -42,7 +17,6 @@ export default class Operation {
         data,
       ],
     });
-    log(this.operationsQ);
     return this;
   }
 
@@ -53,7 +27,6 @@ export default class Operation {
         frame,
       ],
     });
-    log(this.operationsQ);
     return this;
   }
 
@@ -64,7 +37,6 @@ export default class Operation {
         speed,
       ],
     });
-    log(this.operationsQ);
     return this;
   }
 
@@ -76,7 +48,6 @@ export default class Operation {
         options,
       ],
     });
-    log(this.operationsQ);
     return this;
   }
 
@@ -84,7 +55,6 @@ export default class Operation {
     this.operationsQ.push({
       operation: 'emu.poweron',
     });
-    log(this.operationsQ);
     return this;
   }
 
@@ -92,17 +62,12 @@ export default class Operation {
     this.operationsQ.push({
       operation: 'emu.frameadvance',
     });
-    log(this.operationsQ);
     return this;
   }
 
   commit() {
-    return fsP.writeFile(this.file, JSON.stringify(this.operationsQ))
-      .then(() => {
-        this.operationsQ = [];
-        return pWaitFor(() => pathNotExists(this.file))
-          .then(() => { Promise.resolve(); })
-          .catch(() => { Promise.reject(); });
-      });
+    const operations = this.operationsQ;
+    this.operationsQ = [];
+    return operations;
   }
 }

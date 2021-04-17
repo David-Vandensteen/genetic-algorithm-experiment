@@ -391,10 +391,6 @@ end
 -- David Vandensteen
 -- MIT
 --------------------------------------------------------------------------
-operationsFile = "operations.json"
---[{ "operation": "wait", "params": ["100"] }, { "operation": "emu.poweron"}, { "operation": "emu.speedmode", "params": ["normal"] }, { "operation": "print", "params": ["OK"] }, { "operation": "joypad.write", "params": ["1", {"start": true}] }]
-
-loopCycle = 0
 
 local function fileExist(_name)
   local f=io.open(_name,"r")
@@ -471,7 +467,7 @@ function os.capture(cmd, raw)
 end
 
 local function main()
-  local operationsRaw = os.capture("node C:\\Users\\davidv\\Documents\\github\\genetic-algorithm-experiment\\nodejs\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
+  local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
   print(operationsRaw)
 
   if operationsRaw then
@@ -484,11 +480,8 @@ local function main()
     else
       print("Waiting operation...")
       os.timeout(5)
-      -- file doesn t exist
-      -- nothung to do
+      -- nothing to do
     end
-    --emu.frameadvance()
-    loopCycle = loopCycle + 1
   end
 end
 

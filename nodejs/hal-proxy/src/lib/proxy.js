@@ -1,5 +1,9 @@
+import axios from 'axios';
+
+const { get } = axios;
 const { log } = console;
 
+/*
 const response = [
   {
     operation: 'print',
@@ -8,9 +12,13 @@ const response = [
     ],
   },
 ];
+*/
 
 export default class Proxy {
-  constructor() {
-    log(JSON.stringify(response));
+  constructor(serverUrl) {
+    get(`${serverUrl}/operations`)
+      .then((response) => {
+        log(JSON.stringify(response.data));
+      });
   }
 }
