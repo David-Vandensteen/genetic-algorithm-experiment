@@ -6,6 +6,7 @@ export default class Macro {
     if (speed) s = speed;
     return new Operation()
       .emuSpeedMode(s)
+      .emuPowerOn()
       .commit();
   }
 
@@ -21,25 +22,27 @@ export default class Macro {
       .commit();
   }
 
-  static joypadWriteRandomLoop(opMax) {
+  static joypadWriteRandom(probabilities, options) {
     const ops = [];
-    for (let i = 0; i < opMax; i += 1) {
-      ops.push(Macro.joypadWriteRandom());
-      ops.push(new Operation().emuFrameAdvance().commit());
+    let optionsSanity = { quantity: 1, autoFrame: true };
+    if (options) optionsSanity = options;
+    for (let i = 0; i < optionsSanity.quantity; i += 1) {
+      ops.push(
+        new Operation()
+          .joypadWrite('1', {
+            B: Math.random() < probabilities.b,
+            A: Math.random() < probabilities.a,
+            right: Math.random() < probabilities.right,
+            left: Math.random() < probabilities.left,
+            down: Math.random() < probabilities.down,
+            up: Math.random() < probabilities.up,
+          })
+          .commit(),
+      );
+      if (optionsSanity.autoFrame) {
+        ops.push(new Operation().emuFrameAdvance().commit());
+      }
     }
     return ops.flat();
-  }
-
-  static joypadWriteRandom() {
-    return new Operation()
-      .joypadWrite('1', {
-        B: Math.random() < 0.5,
-        A: Math.random() < 0.5,
-        right: Math.random() < 0.5,
-        left: Math.random() < 0.5,
-        down: Math.random() < 0.5,
-        up: Math.random() < 0.5,
-      })
-      .commit();
   }
 }

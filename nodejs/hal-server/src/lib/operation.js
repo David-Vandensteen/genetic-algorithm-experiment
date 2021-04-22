@@ -1,8 +1,20 @@
-const { log } = console;
+import autoincr from 'autoincr';
+
+const id = autoincr();
 
 export default class Operation {
   constructor() {
     this.operationsQ = [];
+  }
+
+  static create(operation, params) {
+    const op = {
+      operation,
+      // id: `${Math.floor(Math.random() * 1000)}${uniqid()}`,
+      id: id.next(),
+    };
+    if (params) { op.params = params; }
+    return op;
   }
 
   add(opArray) {
@@ -11,57 +23,38 @@ export default class Operation {
   }
 
   print(data) {
-    this.operationsQ.push({
-      operation: 'print',
-      params: [
-        data,
-      ],
-    });
+    const op = Operation.create('print', [data]);
+    this.operationsQ.push(op);
     return this;
   }
 
   wait(frame) {
-    this.operationsQ.push({
-      operation: 'wait',
-      params: [
-        frame,
-      ],
-    });
+    const op = Operation.create('wait', [frame]);
+    this.operationsQ.push(op);
     return this;
   }
 
   emuSpeedMode(speed) {
-    this.operationsQ.push({
-      operation: 'emu.speedmode',
-      params: [
-        speed,
-      ],
-    });
+    const op = Operation.create('emu.speedmode', [speed]);
+    this.operationsQ.push(op);
     return this;
   }
 
-  joypadWrite(id, options) {
-    this.operationsQ.push({
-      operation: 'joypad.write',
-      params: [
-        id,
-        options,
-      ],
-    });
+  joypadWrite(idPad, options) {
+    const op = Operation.create('joypad.write', [idPad, options]);
+    this.operationsQ.push(op);
     return this;
   }
 
   emuPowerOn() {
-    this.operationsQ.push({
-      operation: 'emu.poweron',
-    });
+    const op = Operation.create('emu.poweron');
+    this.operationsQ.push(op);
     return this;
   }
 
   emuFrameAdvance() {
-    this.operationsQ.push({
-      operation: 'emu.frameadvance',
-    });
+    const op = Operation.create('emu.frameadvance');
+    this.operationsQ.push(op);
     return this;
   }
 

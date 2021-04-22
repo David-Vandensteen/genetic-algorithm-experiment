@@ -424,8 +424,19 @@ function os.timeout(n) --todo
   os.execute("cmd /c timeout "..n)
 end
 
+local function gradiusIsDead()
+  local rt = false
+  while (memory.readbyte(0x004c) ~= 0x00) do
+    rt = true
+    --print("dead")
+    emu.frameadvance()
+  end
+  return rt
+end
+
 local function handleOperations(operations)
   for i = 1, table.getn(operations) do
+    print("executed operations : "..i)
     if operations[i].operation == "wait" then
       wait(operations[i].params[1])
     end
@@ -443,6 +454,21 @@ local function handleOperations(operations)
     end
     if operations[i].operation == "emu.frameadvance" then
       emu.frameadvance()
+    end
+    if i > 20 and gradiusIsDead() then
+      print('Gradius dead')
+      --local send = { lastOp = operations[i].id, status = false }
+      local send = {}
+      send.lastOp = operations[i].id
+      send.alive = false
+
+      local sendSanity = json.encode(send)
+      print(sendSanity)
+      os.execute("cmd /c c:\\temp\\test.bat --post --lastOp "..operations[i].id.." --alive false")
+      os.execute("cmd /c node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js --post --lastOp "..operations[i].id.." --alive false")
+      os.timeout(100)
+      --print json.encode(send)
+      --operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
     end
   end
 end
@@ -468,8 +494,6 @@ end
 
 local function main()
   local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
-  print(operationsRaw)
-
   if operationsRaw then
     operations = json.decode(operationsRaw)
   end
@@ -477,7 +501,7 @@ local function main()
   while true do
     if operations then
       handleOperations(operations)
-    else
+     else
       print("Waiting operation...")
       os.timeout(5)
       -- nothing to do

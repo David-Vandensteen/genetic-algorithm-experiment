@@ -1,4 +1,5 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import death from 'death';
 import bunyan from 'bunyan';
 import expressBunyan from 'express-bunyan-logger';
@@ -23,6 +24,7 @@ app.set('trust proxy', true);
 
 app.use(cors());
 app.use(expressLogger);
+app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/', appRouter);
 
