@@ -40,6 +40,12 @@ export default class Operation {
     return this;
   }
 
+  emuLoadRom(file) {
+    const op = Operation.create('emu.loadrom', [file]);
+    this.operationsQ.push(op);
+    return this;
+  }
+
   joypadWrite(idPad, options) {
     const op = Operation.create('joypad.write', [idPad, options]);
     this.operationsQ.push(op);
