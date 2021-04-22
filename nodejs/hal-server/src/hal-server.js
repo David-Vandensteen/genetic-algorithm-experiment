@@ -27,6 +27,8 @@ app.use(expressLogger);
 app.use(bodyParser.urlencoded({ extended: false }));
 
 app.use('/', appRouter);
+app.use('/downloads/roms', express.static('static')) // TODO : prod conf
+  .options(cors({ methods: ['OPTIONS', 'GET'] }));
 
 app.use(noRouteHandler);
 app.use(expressErrorLogger);
@@ -41,34 +43,3 @@ death(() => {
   appServer.close();
   healthServer.close();
 });
-
-/*
-import pSeries from 'p-series';
-import Operation from './lib/operation';
-
-const operation = new Operation('./operations.json');
-
-const controls = [];
-for (let i = 0; i < 100; i += 1) {
-  controls.push(
-    () => operation.joypadWrite('1', {
-      B: Math.random() < 0.5,
-      A: Math.random() < 0.5,
-      right: Math.random() < 0.5,
-      left: Math.random() < 0.5,
-      down: Math.random() < 0.5,
-      up: Math.random() < 0.5,
-    })
-      .emuFrameAdvance()
-      .commit(),
-  );
-}
-
-pSeries([
-  () => operation.initMacro('normal')
-    .startMacro()
-    .commit(),
-
-  ...controls,
-]);
-*/

@@ -40,15 +40,4 @@ router
     res.send(200);
   });
 
-// TODO : refactoring
-router
-  .route('/downloads/roms/gradius')
-  .options(cors({ methods: ['OPTIONS', 'GET'] }))
-  .get((req, res) => {
-    // Gradius (USA).zip
-    res.sendFile('Gradius (USA).zip', {
-      root: 'c:\\temp',
-    });
-  });
-
 export default router;

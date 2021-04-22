@@ -1,3 +1,6 @@
+static/*.zip
+static/*.nes
+
 .dist
 
 # Logs
