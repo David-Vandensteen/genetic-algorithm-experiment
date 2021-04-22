@@ -391,6 +391,35 @@ end
 -- David Vandensteen
 -- MIT
 --------------------------------------------------------------------------
+hal = {}
+
+function os.capture(cmd, raw)
+  local handle = assert(io.popen(cmd, 'r'))
+  local output = assert(handle:read('*a'))
+  handle:close()
+  if raw then
+      return output
+  end
+  output = string.gsub(
+      string.gsub(
+          string.gsub(output, '^%s+', ''),
+          '%s+$',
+          ''
+      ),
+      '[\n\r]+',
+      ' '
+  )
+ return output
+end
+
+function hal.getOperations()
+  local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
+  if operationsRaw then
+    local operationsJson = json.decode(operationsRaw)
+  end
+  return operationsJson
+end
+
 
 local function fileExist(_name)
   local f=io.open(_name,"r")
@@ -457,14 +486,7 @@ local function handleOperations(operations)
     end
     if i > 20 and gradiusIsDead() then
       print('Gradius dead')
-      --local send = { lastOp = operations[i].id, status = false }
-      local send = {}
-      send.lastOp = operations[i].id
-      send.alive = false
-
-      local sendSanity = json.encode(send)
-      print(sendSanity)
-      os.execute("cmd /c c:\\temp\\test.bat --post --lastOp "..operations[i].id.." --alive false")
+      -- os.execute("cmd /c c:\\temp\\test.bat --post --lastOp "..operations[i].id.." --alive false")
       os.execute("cmd /c node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js --post --lastOp "..operations[i].id.." --alive false")
       os.timeout(100)
       --print json.encode(send)
@@ -473,30 +495,12 @@ local function handleOperations(operations)
   end
 end
 
-function os.capture(cmd, raw)
-  local handle = assert(io.popen(cmd, 'r'))
-  local output = assert(handle:read('*a'))
-  handle:close()
-  if raw then
-      return output
-  end
-  output = string.gsub(
-      string.gsub(
-          string.gsub(output, '^%s+', ''),
-          '%s+$',
-          ''
-      ),
-      '[\n\r]+',
-      ' '
-  )
- return output
-end
-
 local function main()
-  local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
-  if operationsRaw then
-    operations = json.decode(operationsRaw)
-  end
+  --local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
+  --if operationsRaw then
+  --  operations = json.decode(operationsRaw)
+  --end
+  operations = hal.getOperations()
 
   while true do
     if operations then

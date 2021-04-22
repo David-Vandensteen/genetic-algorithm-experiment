@@ -5,7 +5,6 @@ import Hal from '../lib/hal';
 import pkg from '../../package.json';
 
 const router = new Router();
-
 const { log } = console;
 
 router
@@ -34,8 +33,22 @@ router
     });
   })
   .post((req, res) => {
-    log(req.query.lastOp);
+    // log(req.query.lastOp);
+    if (req.query.alive === 'false') {
+      log('GRADIUS IS DEAD');
+    }
     res.send(200);
+  });
+
+// TODO : refactoring
+router
+  .route('/downloads/roms/gradius')
+  .options(cors({ methods: ['OPTIONS', 'GET'] }))
+  .get((req, res) => {
+    // Gradius (USA).zip
+    res.sendFile('Gradius (USA).zip', {
+      root: 'c:\\temp',
+    });
   });
 
 export default router;

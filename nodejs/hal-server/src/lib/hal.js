@@ -15,7 +15,7 @@ export default class Hal {
         up: 0.5,
       }, {
         autoFrame: true,
-        quantity: 2,
+        quantity: 200,
       }))
       .commit();
   }

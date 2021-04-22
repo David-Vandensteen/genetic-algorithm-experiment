@@ -22,4 +22,4 @@ const config = {
 };
 
 export default config;
-// export const { api } = config;
+// export const { logger } = config;

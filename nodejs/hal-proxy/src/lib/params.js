@@ -9,6 +9,7 @@ class Params {
       '--help': Boolean,
       '--lastOp': Number,
       '--alive': String,
+      '--download': String,
     });
   }
 
@@ -23,7 +24,8 @@ class Params {
     log('');
     log('     Options:');
     log('');
-    log('   --post              -- data to send');
+    log('   --post');
+    log('   --download        : Game rom to download');
     log('');
     process.exit(0);
   }
