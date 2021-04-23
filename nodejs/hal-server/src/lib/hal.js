@@ -14,7 +14,7 @@ export default class Hal {
       log.info('client connected');
 
       socket.on('data', (data) => {
-        log.info('client send :', data.toString());
+        log.info('client send :', JSON.parse(data.toString()));
       });
       Hal.send(Hal.response(), socket);
     });
@@ -56,7 +56,7 @@ export default class Hal {
         up: 0.5,
       }, {
         autoFrame: true,
-        quantity: 200,
+        quantity: 2000,
       }))
       .commit();
   }

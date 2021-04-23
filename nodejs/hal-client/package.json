@@ -3,8 +3,14 @@
   "version": "1.0.0",
   "description": "",
   "scripts": {
-    "start": "C:\\Users\\davidv\\Documents\\fceux-2.3.0-win32\\fceux.exe -lua C:\\Users\\davidv\\Documents\\github\\genetic-algorithm-experiment\\nodejs\\hal-client\\hal-client.lua \"C:\\Users\\davidv\\Documents\\Gradius (USA).zip\""
+    "start": "C:\\Users\\davidv\\Documents\\fceux-2.3.0-win32\\fceux.exe -lua C:\\Users\\davidv\\Documents\\github\\genetic-algorithm-experiment\\nodejs\\hal-client\\hal-client.lua \"C:\\Users\\davidv\\Documents\\Gradius (USA).zip\"",
+    "start:delayed": "delay 5 && npm run start",
+    "serve": "nodemon --watch hal-client.lua --watch ../hal-server/src --exec npm run start:delayed"
   },
   "author": "David Vandensteen <dvandensteen@gmail.com>",
-  "license": "MIT"
+  "license": "MIT",
+  "devDependencies": {
+    "nodemon": "^2.0.7",
+    "delay-cli": "^1.1.0"
+  }
 }

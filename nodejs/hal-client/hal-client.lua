@@ -390,15 +390,19 @@ end
 -- David Vandensteen
 -- MIT
 --------------------------------------------------------------------------
-hal = {}
 local socket = require("socket.core")
+
+hal = {}
+hal.frame = 0
 
 local function gradiusIsDead()
   local rt = false
-  while (memory.readbyte(0x004c) ~= 0x00) do
-    rt = true
-    --print("dead")
-    emu.frameadvance()
+  if hal.frame > 300 then
+    while (memory.readbyte(0x004c) ~= 0x00) do
+      rt = true
+      --print("dead")
+      emu.frameadvance()
+    end
   end
   return rt
 end
@@ -407,7 +411,7 @@ function hal.connect(host, port)
   tcp = assert(socket.tcp())
   tcp:connect(host, port)
   tcp:settimeout(10)
-  --tcp:send("hello HAL\n")
+  tcp:send(json.encode({ message="hello HAL" }))
 end
 
 function hal.receive()
@@ -432,7 +436,13 @@ function hal.operationsHandle(operations)
       emu.speedmode(operations[i].params[1])
     end
     if operations[i].operation == "emu.frameadvance" then
+      hal.frame = hal.frame + 1
       emu.frameadvance()
+    end
+    if gradiusIsDead() then
+      tcp:send(json.encode({ message="is dead", operationID=operations[i].id, alive=0 }))
+    else
+      tcp:send(json.encode({ message="is alive", operationID=operations[i].id, alive=1 }))
     end
   end
 end
@@ -440,19 +450,17 @@ end
 local function main()
   hal.connect("127.0.0.1", 81)
   while true do
-      local operations = hal.receive()
-      if operations then
-        hal.operationsHandle(operations)
-        --emu.frameadvance()
-      else
-        tcp:close()
-        emu.frameadvance()
-      end
-      if status == "closed" then
-        break
-      end
+    local operations = hal.receive()
+    if operations then
+      hal.operationsHandle(operations)
+    else
+      tcp:close()
+      emu.frameadvance()
+    end
+    if status == "closed" then
+      break
+    end
   end
-
   tcp:close()
 end
 
