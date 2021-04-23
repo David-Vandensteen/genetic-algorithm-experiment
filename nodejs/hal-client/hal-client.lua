@@ -385,73 +385,13 @@ function json.decode(str)
 end
 ---------------------------- end of embeded json lib
 
-
 -------------------------------------------------------------------------
 -- H.A.L lua client
 -- David Vandensteen
 -- MIT
 --------------------------------------------------------------------------
 hal = {}
-
-function os.capture(cmd, raw)
-  local handle = assert(io.popen(cmd, 'r'))
-  local output = assert(handle:read('*a'))
-  handle:close()
-  if raw then
-      return output
-  end
-  output = string.gsub(
-      string.gsub(
-          string.gsub(output, '^%s+', ''),
-          '%s+$',
-          ''
-      ),
-      '[\n\r]+',
-      ' '
-  )
- return output
-end
-
-function hal.getOperations()
-  local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
-  if operationsRaw then
-    local operationsJson = json.decode(operationsRaw)
-  end
-  return operationsJson
-end
-
-
-local function fileExist(_name)
-  local f=io.open(_name,"r")
-  if f~=nil then io.close(f) return true else return false end
-end
-
-local function readFile(filePath)
-  input = io.open(filePath, "r")
-  io.input(input)
-  content = io.read()
-  io.close(input)
-  return content
-end
-
-local function writeFile(filePath, text)
-  output = io.open(filePath, "w")
-  io.output(output)
-  io.write(text)
-  io.close(output)
-end
-
-local function wait(frameMax)
-  local curF = emu.framecount()
-  while emu.framecount() < curF + frameMax do
-    emu.frameadvance()
-  end
-end
-
-
-function os.timeout(n) --todo
-  os.execute("cmd /c timeout "..n)
-end
+local socket = require("socket.core")
 
 local function gradiusIsDead()
   local rt = false
@@ -463,12 +403,21 @@ local function gradiusIsDead()
   return rt
 end
 
-local function handleOperations(operations)
+function hal.connect(host, port)
+  tcp = assert(socket.tcp())
+  tcp:connect(host, port);
+  --tcp:send("hello HAL\n");
+end
+
+function hal.receive()
+  local data, status, partial = tcp:receive()
+  local dataSanity = string.gsub(data, "[\n\r]", "")
+  return json.decode(dataSanity)
+end
+
+function hal.operationsHandle(operations)
   for i = 1, table.getn(operations) do
     print("executed operations : "..i)
-    if operations[i].operation == "wait" then
-      wait(operations[i].params[1])
-    end
     if operations[i].operation == "print" then
       print(operations[i].params[1])
     end
@@ -484,33 +433,23 @@ local function handleOperations(operations)
     if operations[i].operation == "emu.frameadvance" then
       emu.frameadvance()
     end
-    if i > 20 and gradiusIsDead() then
-      print('Gradius dead')
-      -- os.execute("cmd /c c:\\temp\\test.bat --post --lastOp "..operations[i].id.." --alive false")
-      os.execute("cmd /c node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js --post --lastOp "..operations[i].id.." --alive false")
-      os.timeout(100)
-      --print json.encode(send)
-      --operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
-    end
   end
 end
 
 local function main()
-  --local operationsRaw = os.capture("node ..\\hal-proxy\\dist\\hal-proxy-bundle.min.js")
-  --if operationsRaw then
-  --  operations = json.decode(operationsRaw)
-  --end
-  operations = hal.getOperations()
-
+  hal.connect("127.0.0.1", 81)
   while true do
-    if operations then
-      handleOperations(operations)
-     else
-      print("Waiting operation...")
-      os.timeout(5)
-      -- nothing to do
-    end
+      local operations = hal.receive()
+      if operations then
+        hal.operationsHandle(operations)
+        --emu.frameadvance()
+      end
+      if status == "closed" then
+        break
+      end
   end
+
+  tcp:close()
 end
 
 main()
