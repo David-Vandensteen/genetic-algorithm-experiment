@@ -405,8 +405,9 @@ end
 
 function hal.connect(host, port)
   tcp = assert(socket.tcp())
-  tcp:connect(host, port);
-  --tcp:send("hello HAL\n");
+  tcp:connect(host, port)
+  tcp:settimeout(10)
+  --tcp:send("hello HAL\n")
 end
 
 function hal.receive()
@@ -443,6 +444,9 @@ local function main()
       if operations then
         hal.operationsHandle(operations)
         --emu.frameadvance()
+      else
+        tcp:close()
+        emu.frameadvance()
       end
       if status == "closed" then
         break
