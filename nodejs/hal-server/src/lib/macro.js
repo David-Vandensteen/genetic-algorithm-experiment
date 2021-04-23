@@ -12,10 +12,10 @@ export default class Macro {
 
   static start() {
     return new Operation()
-      .wait(200)
+      .add(Macro.wait(200))
       .joypadWrite('1', { start: true })
       .emuFrameAdvance()
-      .wait(100)
+      .add(Macro.wait(100))
       .joypadWrite('1', { start: true })
       .emuFrameAdvance()
       .wait(110)
@@ -42,6 +42,18 @@ export default class Macro {
       if (optionsSanity.autoFrame) {
         ops.push(new Operation().emuFrameAdvance().commit());
       }
+    }
+    return ops.flat();
+  }
+
+  static wait(frames) {
+    const ops = [];
+    for (let i = 0; i < frames; i += 1) {
+      ops.push(
+        new Operation()
+          .emuFrameAdvance()
+          .commit(),
+      );
     }
     return ops.flat();
   }
