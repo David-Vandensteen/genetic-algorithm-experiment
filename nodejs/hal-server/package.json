@@ -25,7 +25,6 @@
   },
   "dependencies": {
     "autoincr": "0.0.4",
-    "body-parser": "^1.19.0",
     "bunyan": "^1.8.15"
   }
 }
