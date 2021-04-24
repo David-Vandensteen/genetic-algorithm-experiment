@@ -411,13 +411,26 @@ function hal.connect(host, port)
   tcp = assert(socket.tcp())
   tcp:connect(host, port)
   tcp:settimeout(10)
-  tcp:send(json.encode({ message="hello HAL" }))
+  hal.send({ cmd='connect', message="hello HAL" })
+  hal.wait()
 end
 
 function hal.receive()
   local data, status, partial = tcp:receive()
   local dataSanity = string.gsub(data, "[\n\r]", "")
   return json.decode(dataSanity)
+end
+
+function hal.send(data)
+  tcp:send(json.encode(data))
+  hal.wait()
+end
+
+function hal.wait()
+  local data = hal.receive()
+  if data.cmd == "ready" then
+    return true
+  end
 end
 
 function hal.operationsHandle(operations)
@@ -440,22 +453,25 @@ function hal.operationsHandle(operations)
       emu.frameadvance()
     end
     if gradiusIsDead() then
-      tcp:send(json.encode({ message="is dead", operationID=operations[i].id, alive=0 }))
+      --hal.send({ message="is dead", operationID=operations[i].id, alive=0 })
     else
-      tcp:send(json.encode({ message="is alive", operationID=operations[i].id, alive=1 }))
+      --hal.send({ message="is alive", operationID=operations[i].id, alive=1 })
     end
   end
 end
 
 local function main()
   hal.connect("127.0.0.1", 81)
+  hal.send({ message="ask for operation", cmd="getOperation"})
   while true do
+    --hal.send({ message="ask for operation", cmd="getOperation"})
     local operations = hal.receive()
     if operations then
       hal.operationsHandle(operations)
     else
+      --hal.send({ message="ask for operation", cmd="getOperation"})
       tcp:close()
-      emu.frameadvance()
+      --emu.frameadvance()
     end
     if status == "closed" then
       break
