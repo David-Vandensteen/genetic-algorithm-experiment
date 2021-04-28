@@ -393,6 +393,7 @@ end
 local socket = require("socket.core")
 
 hal = {}
+hal.net = {}
 hal.frame = 0
 
 local function gradiusIsDead()
@@ -407,77 +408,55 @@ local function gradiusIsDead()
   return rt
 end
 
-function hal.connect(host, port)
+function hal.operationHandle(operation)
+  print("execute operation : "..operation.id)
+  if operation.operation == "print" then
+    print(operation.params[1])
+  end
+  if operation.operation == "joypad.write" then
+    joypad.write(operation.params[1], operation.params[2])
+  end
+  if operation.operation == "emu.poweron" then
+    emu.poweron()
+  end
+  if operation.operation == "emu.speedmode" then
+    emu.speedmode(operation.params[1])
+  end
+  if operation.operation == "emu.frameadvance" then
+    emu.frameadvance()
+  end
+  if operation.operation == "memory.readbyte" then
+    local value = memory.readbyte(operation.params[1])
+    tcp:send(json.encode({ cmd="memoryReadByte", params={ operation.params[1] }, data=value }))
+    tcp:receive()
+  end
+end
+
+function main(host, port)
   tcp = assert(socket.tcp())
   tcp:connect(host, port)
   tcp:settimeout(10)
-  hal.send({ cmd='connect', message="hello HAL" })
-  hal.wait()
-end
+  tcp:send(json.encode({ cmd="connect", data="hello HAL", side="client" }))
+  tcp:receive()
 
-function hal.receive()
-  local data, status, partial = tcp:receive()
-  local dataSanity = string.gsub(data, "[\n\r]", "")
-  return json.decode(dataSanity)
-end
+  tcp:send(json.encode({ cmd="getOperations" }))
+  local receive = tcp:receive()
+  local operations = json.decode(receive)
 
-function hal.send(data)
-  tcp:send(json.encode(data))
-  hal.wait()
-end
-
-function hal.wait()
-  local data = hal.receive()
-  if data.cmd == "ready" then
-    return true
-  end
-end
-
-function hal.operationsHandle(operations)
-  for i = 1, table.getn(operations) do
-    print("executed operations : "..i)
-    if operations[i].operation == "print" then
-      print(operations[i].params[1])
-    end
-    if operations[i].operation == "joypad.write" then
-      joypad.write(operations[i].params[1], operations[i].params[2])
-    end
-    if operations[i].operation == "emu.poweron" then
-      emu.poweron()
-    end
-    if operations[i].operation == "emu.speedmode" then
-      emu.speedmode(operations[i].params[1])
-    end
-    if operations[i].operation == "emu.frameadvance" then
-      hal.frame = hal.frame + 1
-      emu.frameadvance()
-    end
-    if gradiusIsDead() then
-      --hal.send({ message="is dead", operationID=operations[i].id, alive=0 })
-    else
-      --hal.send({ message="is alive", operationID=operations[i].id, alive=1 })
-    end
-  end
-end
-
-local function main()
-  hal.connect("127.0.0.1", 81)
-  hal.send({ message="ask for operation", cmd="getOperation"})
+  if operations then print(operations) end
+  hal.frame = 0
   while true do
-    --hal.send({ message="ask for operation", cmd="getOperation"})
-    local operations = hal.receive()
+    --tcp:send(json.encode({ frame=hal.frame, status="alive" }))
+    --local receive = tcp:receive()
+    local receive = nil
+    if receive then
+      --print(receive)
+    end
     if operations then
-      hal.operationsHandle(operations)
-    else
-      --hal.send({ message="ask for operation", cmd="getOperation"})
-      tcp:close()
-      --emu.frameadvance()
+      hal.operationHandle(operations[hal.frame + 1])
     end
-    if status == "closed" then
-      break
-    end
+    hal.frame = hal.frame + 1
   end
-  tcp:close()
 end
 
-main()
+main("127.0.0.1", 81)

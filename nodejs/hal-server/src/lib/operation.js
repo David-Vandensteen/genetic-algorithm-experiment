@@ -64,6 +64,12 @@ export default class Operation {
     return this;
   }
 
+  memoryReadByte(addr) {
+    const op = Operation.create('memory.readbyte', [addr]);
+    this.operationsQ.push(op);
+    return this;
+  }
+
   commit() {
     const operations = this.operationsQ;
     this.operationsQ = [];

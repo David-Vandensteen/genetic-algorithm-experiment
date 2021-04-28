@@ -12,14 +12,15 @@ export default class Hal {
 
     server.on('connection', (socket) => {
       log.info('client connected');
+      // Hal.send({ status: 'ready' }, socket);
 
       socket.on('data', (buffer) => {
         const data = Hal.decode(buffer);
-        log.info('client send :', data);
-        Hal.reply(data, socket);
-        Hal.send({ cmd: 'ready' }, socket);
+        // log.info('client send :', data);
+        const response = Hal.parse(data);
+        Hal.send(response, socket);
+        // Hal.send({ status: 'ready' }, socket);
       });
-      // Hal.send(Hal.response(), socket);
     });
 
     server.on('close', () => {
@@ -41,6 +42,7 @@ export default class Hal {
   }
 
   static send(data, socket) {
+    // log.info('server send : ', data);
     socket.write(`${JSON.stringify(data)}\n`);
     socket.pipe(socket);
   }
@@ -51,15 +53,18 @@ export default class Hal {
     return dataSanity;
   }
 
-  static reply(data, socket) {
+  static parse(data) {
+    let response = {};
     switch (data.cmd) {
       case 'connect':
-        log.info('connect command is received');
-        Hal.send(data, socket);
-        return 200;
-      case 'getOperation':
+        response.cmd = 'connect';
+        response.code = 200;
+        response.data = 'ready';
+        return response;
+
+      case 'getOperations':
         log.info('ask for operation');
-        return new Operation()
+        response = new Operation()
           .add(Macro.joypadWriteRandom({
             a: 0.5,
             b: 0.5,
@@ -69,19 +74,33 @@ export default class Hal {
             up: 0.5,
           }, {
             autoFrame: true,
-            quantity: 100,
+            quantity: 10,
           }))
           .commit();
+        return Hal.response();
+
+      case 'memoryReadByte':
+        log.info('memoryReadByte : ', data);
+        return { cmd: 'memoryReadByte', status: 'ready' };
 
       default:
-        return 500;
+        response.code = '500';
+        response.status = 'ready';
+        return response;
     }
   }
 
   static response() {
     return new Operation()
       .add(Macro.init('normal'))
+      .memoryReadByte(0x004c)
       .add(Macro.start())
+      .memoryReadByte(0x004c)
+      .emuFrameAdvance()
+      .memoryReadByte(0x004c)
+      .emuFrameAdvance()
+      .memoryReadByte(0x004c)
+      .emuFrameAdvance()
       .add(Macro.joypadWriteRandom({
         a: 0.5,
         b: 0.5,
@@ -91,7 +110,7 @@ export default class Hal {
         up: 0.5,
       }, {
         autoFrame: true,
-        quantity: 100,
+        quantity: 2000,
       }))
       .commit();
   }

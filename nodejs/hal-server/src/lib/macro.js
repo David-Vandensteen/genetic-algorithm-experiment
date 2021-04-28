@@ -18,7 +18,7 @@ export default class Macro {
       .add(Macro.wait(100))
       .joypadWrite('1', { start: true })
       .emuFrameAdvance()
-      .wait(110)
+      .add(Macro.wait(110))
       .commit();
   }
 
