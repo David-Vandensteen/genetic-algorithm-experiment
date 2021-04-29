@@ -414,6 +414,11 @@ function hal.operationHandle(operation)
   if operation.operation == "emu.frameadvance" then
     emu.frameadvance()
   end
+  if operation.operation == "rom.readbyte" then
+    local value = rom.readbyte(operation.params[1])
+    tcp:send(json.encode({ cmd="romReadByte", params= { operation.params[1] }, data=value }))
+    tcp:receive()
+  end
   if operation.operation == "memory.readbyte" then
     local value = memory.readbyte(operation.params[1])
     tcp:send(json.encode({ cmd="memoryReadByte", params={ operation.params[1] }, data=value }))

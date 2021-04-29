@@ -1,3 +1,4 @@
-import Hal from './lib/hal';
+import Gradius from './gradius';
 
-Hal.start();
+const gradius = new Gradius();
+gradius.start();

@@ -1,61 +1,59 @@
 import net from 'net';
 import bunyan from 'bunyan';
-import autoincr from 'autoincr';
-import Operation from './operation';
-import Macro from './macro';
+// import autoincr from 'autoincr';
 import config from '../config';
 
-const log = bunyan.createLogger({ name: 'hal-server' });
-const frame = autoincr();
-let startGame = false;
-
-function serializeOperation(operation) {
-  const operationSerialized = JSON.stringify(operation)
-    .replace('{', '')
-    .replace('}', '')
-    .replace('"id":', '')
-    .replace('"operation":', '');
-  return operationSerialized;
-}
-
 export default class Hal {
-  static start() {
+  constructor() {
+    this.romHead = [];
+    this.log = bunyan.createLogger({ name: 'hal-server ' });
+    this.startGame = false;
+  //    this.frame = autoincr();
+  }
+
+  start() {
     const server = net.createServer();
 
     server.on('connection', (socket) => {
-      log.info('client connected');
+      this.log.info('client is connected');
       Hal.send({ operation: 'ready' }, socket);
 
       socket.on('data', (buffer) => {
         const data = Hal.decode(buffer);
-        // log.info('client send :', data);
-        const response = Hal.parse(data);
+        const response = this.parse(data);
         Hal.send(response, socket);
-        // Hal.send({ status: 'ready' }, socket);
       });
     });
 
     server.on('close', () => {
-      log.info('client disconnected');
+      this.log.info('client is disconnected');
     });
 
     server.on('error', (err) => {
-      log.error(err);
+      this.log.error(err);
     });
 
     server.on('listening', () => {
-      log.info('server started');
+      this.log.info('server is started');
     });
 
-    server.on('data', (data) => {
-      log.info('client send :', data);
-    });
     server.listen(config.server.port, config.server.host);
+  }
+
+  operationsInit() { // callback need to be implement on child class
+    return this;
+  }
+
+  operationsUpdate() { // callback need to be implement on child class
+    return this;
+  }
+
+  dead() { // callback need to be implement on child class
+    return this;
   }
 
   static send(data, socket) {
     socket.write(`${JSON.stringify(data)}\n`);
-    // socket.pipe(socket);
   }
 
   static decode(buffer) {
@@ -64,8 +62,9 @@ export default class Hal {
     return data;
   }
 
-  static parse(data) {
+  parse(data) {
     const response = {};
+    this.log.info('client query :', data);
     switch (data.cmd) {
       case 'connect':
         response.cmd = 'connect';
@@ -73,18 +72,19 @@ export default class Hal {
         response.data = 'ready';
         return response;
 
+      case 'romReadByte':
+        return { cmd: 'ready' };
+
       case 'getOperations':
-        log.info('ask for operation');
-        if (startGame) {
-          return Hal.frameResponse();
+        if (this.startGame) {
+          return this.operationsUpdate();
         }
-        startGame = true;
-        return Hal.startResponse();
+        this.startGame = true;
+        return this.operationsInit();
 
       case 'memoryReadByte':
-        // log.info('memoryReadByte : ', data);
-        if (data.data > 0 && data.data < 255) {
-          log.info('GRADIUS IS DEAD');
+        if (this.dead(data.data)) {
+          this.startGame = false;
         }
         return { cmd: 'memoryReadByte', status: 'ready' };
 
@@ -93,45 +93,5 @@ export default class Hal {
         response.status = 'ready';
         return response;
     }
-  }
-
-  static frameResponse() {
-    return new Operation()
-      .add(
-        Macro.joypadWriteRandom({
-          a: 0.5,
-          b: 0.5,
-          right: 0.5,
-          left: 0.5,
-          down: 0.5,
-          up: 0.5,
-        }),
-      )
-      .memoryReadByte(0x004c)
-      .emuFrameAdvance()
-      .commit();
-  }
-
-  static startResponse() {
-    const operation = new Operation();
-    operation
-      .add(Macro.init('normal'))
-      .add(Macro.start())
-      .emuFrameAdvance();
-    /*
-    for (let i = 0; i < 2000; i += 1) {
-      operation.add(Macro.joypadWriteRandom({
-        a: 0.5,
-        b: 0.5,
-        right: 0.5,
-        left: 0.5,
-        down: 0.5,
-        up: 0.5,
-      }))
-        .emuFrameAdvance()
-        .memoryReadByte(0x004c);
-    }
-    */
-    return operation.commit();
   }
 }

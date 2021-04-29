@@ -70,6 +70,12 @@ export default class Operation {
     return this;
   }
 
+  romReadByte(addr) {
+    const op = Operation.create('rom.readbyte', [addr]);
+    this.operationsQ.push(op);
+    return this;
+  }
+
   commit() {
     const operations = this.operationsQ;
     this.operationsQ = [];

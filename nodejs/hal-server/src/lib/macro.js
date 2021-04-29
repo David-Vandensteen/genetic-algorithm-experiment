@@ -12,6 +12,7 @@ export default class Macro {
 
   static start() {
     return new Operation()
+      .add(Macro.getHeader())
       .add(Macro.wait(200))
       .joypadWrite('1', { start: true })
       .emuFrameAdvance()
@@ -33,6 +34,16 @@ export default class Macro {
         up: Math.random() < probabilities.up,
       })
       .commit();
+  }
+
+  static getHeader() {
+    const operation = new Operation();
+    for (let i = 0; i < 16; i += 1) {
+      operation
+        .romReadByte(i)
+        .emuFrameAdvance();
+    }
+    return operation.commit();
   }
 
   static wait(frames) {
