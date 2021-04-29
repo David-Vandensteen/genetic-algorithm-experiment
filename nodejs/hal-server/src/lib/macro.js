@@ -22,28 +22,17 @@ export default class Macro {
       .commit();
   }
 
-  static joypadWriteRandom(probabilities, options) {
-    const ops = [];
-    let optionsSanity = { quantity: 1, autoFrame: true };
-    if (options) optionsSanity = options;
-    for (let i = 0; i < optionsSanity.quantity; i += 1) {
-      ops.push(
-        new Operation()
-          .joypadWrite('1', {
-            B: Math.random() < probabilities.b,
-            A: Math.random() < probabilities.a,
-            right: Math.random() < probabilities.right,
-            left: Math.random() < probabilities.left,
-            down: Math.random() < probabilities.down,
-            up: Math.random() < probabilities.up,
-          })
-          .commit(),
-      );
-      if (optionsSanity.autoFrame) {
-        ops.push(new Operation().emuFrameAdvance().commit());
-      }
-    }
-    return ops.flat();
+  static joypadWriteRandom(probabilities) {
+    return new Operation()
+      .joypadWrite('1', {
+        B: Math.random() < probabilities.b,
+        A: Math.random() < probabilities.a,
+        right: Math.random() < probabilities.right,
+        left: Math.random() < probabilities.left,
+        down: Math.random() < probabilities.down,
+        up: Math.random() < probabilities.up,
+      })
+      .commit();
   }
 
   static wait(frames) {

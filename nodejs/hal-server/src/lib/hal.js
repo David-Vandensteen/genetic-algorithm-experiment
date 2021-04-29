@@ -1,10 +1,22 @@
 import net from 'net';
 import bunyan from 'bunyan';
+import autoincr from 'autoincr';
 import Operation from './operation';
 import Macro from './macro';
 import config from '../config';
 
 const log = bunyan.createLogger({ name: 'hal-server' });
+const frame = autoincr();
+let startGame = false;
+
+function serializeOperation(operation) {
+  const operationSerialized = JSON.stringify(operation)
+    .replace('{', '')
+    .replace('}', '')
+    .replace('"id":', '')
+    .replace('"operation":', '');
+  return operationSerialized;
+}
 
 export default class Hal {
   static start() {
@@ -12,7 +24,7 @@ export default class Hal {
 
     server.on('connection', (socket) => {
       log.info('client connected');
-      // Hal.send({ status: 'ready' }, socket);
+      Hal.send({ operation: 'ready' }, socket);
 
       socket.on('data', (buffer) => {
         const data = Hal.decode(buffer);
@@ -42,19 +54,18 @@ export default class Hal {
   }
 
   static send(data, socket) {
-    // log.info('server send : ', data);
     socket.write(`${JSON.stringify(data)}\n`);
-    socket.pipe(socket);
+    // socket.pipe(socket);
   }
 
   static decode(buffer) {
     const dataStrRaw = buffer.toString();
-    const dataSanity = JSON.parse(dataStrRaw);
-    return dataSanity;
+    const data = JSON.parse(dataStrRaw.replace('\n', ''));
+    return data;
   }
 
   static parse(data) {
-    let response = {};
+    const response = {};
     switch (data.cmd) {
       case 'connect':
         response.cmd = 'connect';
@@ -64,23 +75,17 @@ export default class Hal {
 
       case 'getOperations':
         log.info('ask for operation');
-        response = new Operation()
-          .add(Macro.joypadWriteRandom({
-            a: 0.5,
-            b: 0.5,
-            right: 0.5,
-            left: 0.5,
-            down: 0.5,
-            up: 0.5,
-          }, {
-            autoFrame: true,
-            quantity: 10,
-          }))
-          .commit();
-        return Hal.response();
+        if (startGame) {
+          return Hal.frameResponse();
+        }
+        startGame = true;
+        return Hal.startResponse();
 
       case 'memoryReadByte':
-        log.info('memoryReadByte : ', data);
+        // log.info('memoryReadByte : ', data);
+        if (data.data > 0 && data.data < 255) {
+          log.info('GRADIUS IS DEAD');
+        }
         return { cmd: 'memoryReadByte', status: 'ready' };
 
       default:
@@ -90,28 +95,43 @@ export default class Hal {
     }
   }
 
-  static response() {
+  static frameResponse() {
     return new Operation()
+      .add(
+        Macro.joypadWriteRandom({
+          a: 0.5,
+          b: 0.5,
+          right: 0.5,
+          left: 0.5,
+          down: 0.5,
+          up: 0.5,
+        }),
+      )
+      .memoryReadByte(0x004c)
+      .emuFrameAdvance()
+      .commit();
+  }
+
+  static startResponse() {
+    const operation = new Operation();
+    operation
       .add(Macro.init('normal'))
-      .memoryReadByte(0x004c)
       .add(Macro.start())
-      .memoryReadByte(0x004c)
-      .emuFrameAdvance()
-      .memoryReadByte(0x004c)
-      .emuFrameAdvance()
-      .memoryReadByte(0x004c)
-      .emuFrameAdvance()
-      .add(Macro.joypadWriteRandom({
+      .emuFrameAdvance();
+    /*
+    for (let i = 0; i < 2000; i += 1) {
+      operation.add(Macro.joypadWriteRandom({
         a: 0.5,
         b: 0.5,
         right: 0.5,
         left: 0.5,
         down: 0.5,
         up: 0.5,
-      }, {
-        autoFrame: true,
-        quantity: 2000,
       }))
-      .commit();
+        .emuFrameAdvance()
+        .memoryReadByte(0x004c);
+    }
+    */
+    return operation.commit();
   }
 }

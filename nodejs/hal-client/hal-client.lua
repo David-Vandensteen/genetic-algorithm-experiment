@@ -390,23 +390,12 @@ end
 -- David Vandensteen
 -- MIT
 --------------------------------------------------------------------------
+
 local socket = require("socket.core")
 
 hal = {}
 hal.net = {}
 hal.frame = 0
-
-local function gradiusIsDead()
-  local rt = false
-  if hal.frame > 300 then
-    while (memory.readbyte(0x004c) ~= 0x00) do
-      rt = true
-      --print("dead")
-      emu.frameadvance()
-    end
-  end
-  return rt
-end
 
 function hal.operationHandle(operation)
   print("execute operation : "..operation.id)
@@ -436,24 +425,27 @@ function main(host, port)
   tcp = assert(socket.tcp())
   tcp:connect(host, port)
   tcp:settimeout(10)
+
   tcp:send(json.encode({ cmd="connect", data="hello HAL", side="client" }))
   tcp:receive()
+  emu.frameadvance()
 
   tcp:send(json.encode({ cmd="getOperations" }))
   local receive = tcp:receive()
   local operations = json.decode(receive)
+  emu.frameadvance()
 
   if operations then print(operations) end
   hal.frame = 0
   while true do
-    --tcp:send(json.encode({ frame=hal.frame, status="alive" }))
-    --local receive = tcp:receive()
-    local receive = nil
-    if receive then
-      --print(receive)
-    end
-    if operations then
-      hal.operationHandle(operations[hal.frame + 1])
+    if operations[1] then
+      hal.operationHandle(operations[1])
+      table.remove(operations, 1)
+    else
+      tcp:send(json.encode({ cmd="getOperations" }))
+      receive = tcp:receive()
+      print(receive)
+      operations = json.decode(receive)
     end
     hal.frame = hal.frame + 1
   end
