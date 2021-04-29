@@ -4,6 +4,7 @@ import Macro from './lib/macro';
 
 export default class Gradius extends Hal {
   operationsInit() {
+    this.log.info('playing macro game start');
     this.startGame = true;
     const operation = new Operation();
     operation
@@ -15,6 +16,7 @@ export default class Gradius extends Hal {
 
   // eslint-disable-next-line class-methods-use-this
   operationsUpdate() {
+    // this.log.info('client ask for new operations ...');
     return new Operation()
       .add(
         Macro.joypadWriteRandom({
@@ -33,6 +35,8 @@ export default class Gradius extends Hal {
 
   // eslint-disable-next-line class-methods-use-this
   dead(data) {
-    return (data > 0 && data < 255);
+    const isDead = (data > 0 && data < 255);
+    if (isDead) this.log.info('PLAYER IS DEAD - RESET GAME');
+    return isDead;
   }
 }

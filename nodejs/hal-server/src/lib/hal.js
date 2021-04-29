@@ -1,6 +1,7 @@
 import net from 'net';
+import ora from 'ora';
 import bunyan from 'bunyan';
-// import autoincr from 'autoincr';
+import autoincr from 'autoincr';
 import config from '../config';
 
 export default class Hal {
@@ -8,25 +9,33 @@ export default class Hal {
     this.romHead = [];
     this.log = bunyan.createLogger({ name: 'hal-server ' });
     this.startGame = false;
-  //    this.frame = autoincr();
+    this.frame = autoincr();
   }
 
   start() {
+    const spinnerWaitingServer = ora('waiting server...').start();
+    const spinnerWaitingClient = ora('waiting client connection...');
+    const spinnerWaitingQuery = ora('waiting client query...');
+
     const server = net.createServer();
 
     server.on('connection', (socket) => {
-      this.log.info('client is connected');
-      Hal.send({ operation: 'ready' }, socket);
+      spinnerWaitingClient.succeed('client is connected');
+      spinnerWaitingQuery.start();
+      this.socket = socket;
+      this.send({ operation: 'ready' });
 
       socket.on('data', (buffer) => {
-        const data = Hal.decode(buffer);
-        const response = this.parse(data);
-        Hal.send(response, socket);
+        const query = Hal.decode(buffer);
+        const response = this.parse(query);
+        this.send(response);
+        spinnerWaitingQuery.text = `frame ${this.frame.next()} :  client request ${query.cmd}`;
+        // spinnerWaitingQuery.start();
       });
     });
 
     server.on('close', () => {
-      this.log.info('client is disconnected');
+      spinnerWaitingClient.fail('client is disconnected');
     });
 
     server.on('error', (err) => {
@@ -34,26 +43,15 @@ export default class Hal {
     });
 
     server.on('listening', () => {
-      this.log.info('server is started');
+      spinnerWaitingServer.succeed('server is started');
+      spinnerWaitingClient.start();
     });
 
     server.listen(config.server.port, config.server.host);
   }
 
-  operationsInit() { // callback need to be implement on child class
-    return this;
-  }
-
-  operationsUpdate() { // callback need to be implement on child class
-    return this;
-  }
-
-  dead() { // callback need to be implement on child class
-    return this;
-  }
-
-  static send(data, socket) {
-    socket.write(`${JSON.stringify(data)}\n`);
+  send(data) {
+    this.socket.write(`${JSON.stringify(data)}\n`);
   }
 
   static decode(buffer) {
@@ -62,15 +60,10 @@ export default class Hal {
     return data;
   }
 
-  parse(data) {
-    const response = {};
-    this.log.info('client query :', data);
-    switch (data.cmd) {
+  parse(query) {
+    switch (query.cmd) {
       case 'connect':
-        response.cmd = 'connect';
-        response.code = 200;
-        response.data = 'ready';
-        return response;
+        return { cmd: 'connect' };
 
       case 'romReadByte':
         return { cmd: 'ready' };
@@ -83,15 +76,25 @@ export default class Hal {
         return this.operationsInit();
 
       case 'memoryReadByte':
-        if (this.dead(data.data)) {
+        if (this.dead(query.data)) {
           this.startGame = false;
         }
         return { cmd: 'memoryReadByte', status: 'ready' };
 
       default:
-        response.code = '500';
-        response.status = 'ready';
-        return response;
+        return { cmd: 'nothing' };
     }
+  }
+
+  operationsInit() { // callback need to be implement on child class
+    return this;
+  }
+
+  operationsUpdate() { // callback need to be implement on child class
+    return this;
+  }
+
+  dead() { // callback need to be implement on child class
+    return this;
   }
 }

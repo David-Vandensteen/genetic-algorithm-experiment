@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "autoincr": "0.0.4",
-    "bunyan": "^1.8.15"
+    "bunyan": "^1.8.15",
+    "ora": "^5.4.0"
   }
 }
