@@ -1,6 +1,4 @@
-static/*.zip
-static/*.nes
-
+db.json
 .dist
 
 # Logs

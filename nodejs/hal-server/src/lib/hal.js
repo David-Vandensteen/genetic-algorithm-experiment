@@ -1,6 +1,6 @@
 import net from 'net';
-import ora from 'ora';
 import bunyan from 'bunyan';
+import Spinnies from 'spinnies';
 import autoincr from 'autoincr';
 import config from '../config';
 
@@ -10,32 +10,31 @@ export default class Hal {
     this.log = bunyan.createLogger({ name: 'hal-server ' });
     this.startGame = false;
     this.frame = autoincr();
+    this.spinnies = new Spinnies();
+    this.spinnies.add('waiting-server');
   }
 
   start() {
-    const spinnerWaitingServer = ora('waiting server...').start();
-    const spinnerWaitingClient = ora('waiting client connection...');
-    const spinnerWaitingQuery = ora('waiting client query...');
-
     const server = net.createServer();
 
     server.on('connection', (socket) => {
-      spinnerWaitingClient.succeed('client is connected');
-      spinnerWaitingQuery.start();
+      this.spinnies.succeed('waiting-client');
+      this.spinnies.add('mode', { text: 'mode : live' });
+      this.spinnies.add('player', { text: 'player is alive' });
+      this.spinnies.add('frame');
       this.socket = socket;
       this.send({ operation: 'ready' });
 
       socket.on('data', (buffer) => {
+        this.spinnies.update('frame', { text: `frame : ${this.frame.next()}` });
         const query = Hal.decode(buffer);
         const response = this.parse(query);
         this.send(response);
-        spinnerWaitingQuery.text = `frame ${this.frame.next()} :  client request ${query.cmd}`;
-        // spinnerWaitingQuery.start();
       });
     });
 
     server.on('close', () => {
-      spinnerWaitingClient.fail('client is disconnected');
+      this.spinnies.fail('waiting-client');
     });
 
     server.on('error', (err) => {
@@ -43,8 +42,8 @@ export default class Hal {
     });
 
     server.on('listening', () => {
-      spinnerWaitingServer.succeed('server is started');
-      spinnerWaitingClient.start();
+      this.spinnies.succeed('waiting-server');
+      this.spinnies.add('waiting-client');
     });
 
     server.listen(config.server.port, config.server.host);

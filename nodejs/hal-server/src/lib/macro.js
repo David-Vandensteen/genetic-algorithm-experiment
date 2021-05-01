@@ -10,19 +10,6 @@ export default class Macro {
       .commit();
   }
 
-  static start() {
-    return new Operation()
-      .add(Macro.getHeader())
-      .add(Macro.wait(200))
-      .joypadWrite('1', { start: true })
-      .emuFrameAdvance()
-      .add(Macro.wait(100))
-      .joypadWrite('1', { start: true })
-      .emuFrameAdvance()
-      .add(Macro.wait(110))
-      .commit();
-  }
-
   static joypadWriteRandom(probabilities) {
     return new Operation()
       .joypadWrite('1', {

@@ -4,14 +4,26 @@ import Macro from './lib/macro';
 
 export default class Gradius extends Hal {
   operationsInit() {
+    this.spinnies.remove('player');
+    this.spinnies.add('player', { text: 'player is alive' });
     this.log.info('playing macro game start');
     this.startGame = true;
-    const operation = new Operation();
-    operation
-      .add(Macro.init('normal'))
-      .add(Macro.start())
-      .emuFrameAdvance();
-    return operation.commit();
+    if (Operation.getHistory()) {
+      this.spinnies.update('mode', { text: 'mode : replay' });
+      // this.log.info(Operation.getHistory());
+      return Operation.getHistory();
+    }
+    return new Operation()
+      .emuPowerOn()
+      .add(Macro.getHeader())
+      .add(Macro.wait(200))
+      .joypadWrite('1', { start: true })
+      .emuFrameAdvance()
+      .add(Macro.wait(100))
+      .joypadWrite('1', { start: true })
+      .emuFrameAdvance()
+      .add(Macro.wait(110))
+      .commit();
   }
 
   // eslint-disable-next-line class-methods-use-this
@@ -36,7 +48,11 @@ export default class Gradius extends Hal {
   // eslint-disable-next-line class-methods-use-this
   dead(data) {
     const isDead = (data > 0 && data < 255);
-    if (isDead) this.log.info('PLAYER IS DEAD - RESET GAME');
+    if (isDead) {
+      this.log.info('PLAYER IS DEAD - RESET GAME');
+      this.replay = true;
+      this.spinnies.fail('player', { text: 'player is death' });
+    }
     return isDead;
   }
 }

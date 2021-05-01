@@ -1,6 +1,9 @@
+import { JsonDB } from 'node-json-db';
+import { Config } from 'node-json-db/dist/lib/JsonDBConfig';
 import autoincr from 'autoincr';
 
 const id = autoincr();
+const db = new JsonDB(new Config('db', false, false, '/'));
 
 export default class Operation {
   constructor() {
@@ -15,6 +18,16 @@ export default class Operation {
     };
     if (params) { op.params = params; }
     return op;
+  }
+
+  static getHistory() {
+    let operationsHistory = false;
+    try {
+      operationsHistory = db.getData('/operations');
+    } catch (error) {
+      return false;
+    }
+    return operationsHistory;
   }
 
   add(opArray) {
@@ -79,6 +92,13 @@ export default class Operation {
   commit() {
     const operations = this.operationsQ;
     this.operationsQ = [];
+    let operationsHistory = [];
+    try {
+      operationsHistory = db.getData('/operations');
+    } catch (error) {
+      console.error(error);
+    }
+    db.push('/operations', operationsHistory.concat(operations));
     return operations;
   }
 }
